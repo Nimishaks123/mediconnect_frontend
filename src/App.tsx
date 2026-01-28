@@ -22,6 +22,10 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import DoctorListPage from "./pages/DoctorListPage";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import DoctorAvailabilityPage from "./pages/DoctorAvailabilityPage";
+import DoctorSchedulePage from "./pages/doctor/schedule";
+import DoctorSlotsPage from "./pages/doctor/slots";
+import DoctorAppointmentPage from "./pages/DoctorAppointmentPage";
+
 import { ROUTES } from "./constants/routes";
 
 const App = () => {
@@ -72,6 +76,11 @@ const App = () => {
     path={ROUTES.DOCTOR_AVAILABILITY}
     element={<DoctorAvailabilityPage />}
   />
+  <Route
+    path="/patient/appointments/:doctorId"
+    element={<DoctorAppointmentPage />}
+  />
+
 </Route>
 
         {/* DOCTOR */}
@@ -80,6 +89,9 @@ const App = () => {
     path={ROUTES.DOCTOR_DASHBOARD}
     element={<DoctorDashboard />}
   />
+   <Route path="/doctor/schedule" element={<DoctorSchedulePage />} />
+    <Route path="/doctor/slots" element={<DoctorSlotsPage />} />
+   
   <Route
     path={ROUTES.DOCTOR_ONBOARDING}
     element={<DoctorOnboarding />}

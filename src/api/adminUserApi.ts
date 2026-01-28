@@ -1,6 +1,4 @@
 import { api } from "./api";
-
-/* -------------------- TYPES -------------------- */
 export interface AdminUser {
   id: string;
   name: string;
@@ -22,8 +20,6 @@ export interface GetAllUsersResponse {
   page: number;
   limit: number;
 }
-
-/* -------------------- API -------------------- */
 export const adminUserApi = {
   getAllUsers: (params: GetAllUsersParams) =>
     api.get<GetAllUsersResponse>("/admin/users", {

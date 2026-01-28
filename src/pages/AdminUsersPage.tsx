@@ -14,7 +14,6 @@ export default function AdminUsersPage() {
     (state) => state.adminUsers
   );
 
-  /* -------------------- LOCAL STATE -------------------- */
   const [search, setSearch] = useState("");
   //const[isSearching,setIsSearch]=useState(false);
   const [debouncedSearch, setDebouncedSearch] = useState("");
