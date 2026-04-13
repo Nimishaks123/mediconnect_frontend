@@ -1,3 +1,8 @@
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { scheduleSchema } from "../../validation/scheduleSchema";
+import type { ScheduleFormData } from "../../validation/scheduleSchema";
 export type CreateDoctorSchedulePayload = {
   rrule: string;
   timeWindows: {
@@ -9,16 +14,10 @@ export type CreateDoctorSchedulePayload = {
   validTo: string;
   timezone: string;
 };
+
 type ScheduleFormProps = {
   onSubmit: (payload: CreateDoctorSchedulePayload) => void;
 };
-
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { scheduleSchema } from "../../validation/scheduleSchema";
-import type { ScheduleFormData } from "../../validation/scheduleSchema";
 
 type TimeWindow = {
   start: string;
@@ -35,9 +34,10 @@ const DAYS = [
   { label: "Sun", value: "SU" },
 ];
 
-export default function ScheduleForm({
-  onSubmit,
-}: ScheduleFormProps) {
+export default function ScheduleForm({ onSubmit }: ScheduleFormProps) {
+   
+
+
 
   /* ───────── state ───────── */
 
@@ -59,14 +59,18 @@ export default function ScheduleForm({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ScheduleFormData>({
     resolver: zodResolver(scheduleSchema),
+    defaultValues: {
+      rrule: "",
+      timeWindows: [],
+    },
   });
 
-  /* ───────── helpers ───────── */
 
-  const toggleDay = (day: string) => {
+const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
       prev.includes(day)
         ? prev.filter((d) => d !== day)
@@ -74,10 +78,15 @@ export default function ScheduleForm({
     );
   };
 
-  const generateRRule = () => {
+  const generateRRule = useCallback(() => {
     if (frequency === "DAILY") return "FREQ=DAILY";
     return `FREQ=WEEKLY;BYDAY=${selectedDays.join(",")}`;
-  };
+  }, [frequency, selectedDays]);
+
+  useEffect(() => {
+    setValue("timeWindows", timeWindows, { shouldValidate: true });
+    setValue("rrule", generateRRule(), { shouldValidate: true });
+  }, [generateRRule, setValue, timeWindows]);
 
   const addTimeWindow = () => {
     setTimeWindows([...timeWindows, { start: "", end: "" }]);
@@ -87,21 +96,24 @@ export default function ScheduleForm({
     setTimeWindows(timeWindows.filter((_, i) => i !== index));
   };
 
-  /* ───────── submit ───────── */
 
   const submitHandler = (data: ScheduleFormData) => {
-    // ✅ clean + validate time windows
     const cleanedTimeWindows = timeWindows.filter(
       (w) => w.start && w.end && w.start < w.end
     );
 
     if (cleanedTimeWindows.length === 0) {
-      alert("Please add at least one valid time range");
+      setValue("timeWindows", [], { shouldValidate: true });
       return;
     }
 
+    const rrule = generateRRule();
+
+    setValue("rrule", rrule, { shouldValidate: true });
+    setValue("timeWindows", cleanedTimeWindows, { shouldValidate: true });
+
     onSubmit({
-      rrule: generateRRule(),
+      rrule,
       timeWindows: cleanedTimeWindows,
       slotDuration: data.slotDuration,
       validFrom: data.validFrom,
@@ -110,7 +122,6 @@ export default function ScheduleForm({
     });
   };
 
-  /* ───────── UI ───────── */
 
   return (
     <form
@@ -164,6 +175,12 @@ export default function ScheduleForm({
             )}
           </div>
         ))}
+
+        {errors.timeWindows && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.timeWindows.message}
+          </p>
+        )}
 
         <button
           type="button"
@@ -230,6 +247,12 @@ export default function ScheduleForm({
               </button>
             ))}
           </div>
+
+          {errors.rrule && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.rrule.message}
+            </p>
+          )}
         </div>
       )}
 
@@ -244,6 +267,12 @@ export default function ScheduleForm({
             {...register("validFrom")}
             className="w-full border rounded-lg px-3 py-2"
           />
+          {errors.validFrom && (
+  <p className="text-red-500 text-xs">
+    {errors.validFrom.message}
+  </p>
+)}
+
         </div>
 
         <div>
@@ -255,6 +284,11 @@ export default function ScheduleForm({
             {...register("validTo")}
             className="w-full border rounded-lg px-3 py-2"
           />
+          {errors.validTo && (
+            <p className="text-red-500 text-xs">
+              {errors.validTo.message}
+            </p>
+          )}
         </div>
       </div>
 

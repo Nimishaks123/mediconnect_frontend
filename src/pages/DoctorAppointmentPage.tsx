@@ -4,25 +4,31 @@ import {
   getDoctorSlotsForPatient,
 } from "../api/schedule";
 import type { DoctorSlot } from "../api/schedule";
+import { createAppointment } from "../api/appointments";
+import { createCheckoutSession } from "../api/paymentApi";
+import { toast } from "react-hot-toast";
 
 const DAYS_TO_SHOW = 7;
+
+const getLocalDateString = (date: Date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
 
 export default function DoctorAppointmentPage() {
   const { doctorId } = useParams<{ doctorId: string }>();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDateString(new Date());
 
   const [selectedDate, setSelectedDate] = useState(today);
   const [slots, setSlots] = useState<DoctorSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<DoctorSlot | null>(null);
   const [loading, setLoading] = useState(false);
 
-  /* ───────── fetch slots (PATIENT API) ───────── */
-
   useEffect(() => {
-    console.log("Selected date:", selectedDate);
-  console.log("All slots from API:", slots);
-    if (!doctorId) return;
+    if (!doctorId || doctorId === "undefined") return;
 
     setLoading(true);
     setSelectedSlot(null);
@@ -32,18 +38,20 @@ export default function DoctorAppointmentPage() {
       selectedDate,
       selectedDate
     )
-      .then((res) => setSlots(res.data))
-      .catch(console.error)
+      .then((res) => {
+        setSlots(res.data);
+      })
+      .catch(() => {
+        // quiet fail
+      })
       .finally(() => setLoading(false));
   }, [doctorId, selectedDate]);
-
-  /* ───────── helpers ───────── */
 
   const getNextDays = () => {
     return Array.from({ length: DAYS_TO_SHOW }).map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() + i);
-      return d.toISOString().split("T")[0];
+      return getLocalDateString(d);
     });
   };
 
@@ -51,21 +59,88 @@ export default function DoctorAppointmentPage() {
     (slot) => slot.date === selectedDate
   );
 
-  /* ───────── UI ───────── */
+  // const handleConfirmAppointment = async () => {
+  //   if (!selectedSlot || !doctorId) return;
+
+  //   try {
+  //     setLoading(true);
+
+  //     //Create appointment (PAYMENT_PENDING)
+  //     const appointmentRes = await createAppointment({
+  //       doctorId,
+  //       date: selectedDate,
+  //       startTime: selectedSlot.startTime,
+  //       endTime: selectedSlot.endTime,
+  //     });
+
+  //     const appointmentId = appointmentRes.appointmentId;
+
+  //     // Create Stripe Checkout session
+  //     const paymentRes = await createCheckoutSession(
+  //       appointmentId
+  //     );
+
+  //     // Redirect to Stripe  checkout
+  //     window.location.href = paymentRes.checkoutUrl;
+
+  //   } catch (err: any) {
+  //     alert(
+  //       err.response?.data?.message ||
+  //       "Unable to proceed to payment"
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  const handleConfirmAppointment = async () => {
+  if (!selectedSlot || !doctorId || doctorId === "undefined") return;
+
+  try {
+    setLoading(true);
+
+    // Create availabilityId exactly how backend expects
+    const availabilityId = `${doctorId}_${selectedDate}_${selectedSlot.startTime}_${selectedSlot.endTime}`;
+
+    const appointmentRes = await createAppointment({
+      doctorId,
+      availabilityId,
+    });
+
+    const appointmentId = appointmentRes.appointmentId;
+
+    // Create Stripe Checkout session
+    const paymentRes = await createCheckoutSession(appointmentId);
+
+    // Redirect to Stripe
+    window.location.href = paymentRes.checkoutUrl;
+
+  } catch (err: unknown) {
+    const error = err as { response?: { data?: { message?: string } } };
+    toast.error(
+      error.response?.data?.message ||
+      "Unable to proceed to payment"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold">Book Appointment</h1>
+        <h1 className="text-2xl font-semibold">
+          Book Appointment
+        </h1>
         <p className="text-gray-500 text-sm">
           Choose a date and available time slot
         </p>
       </div>
 
-      {/* Date selector */}
+      {/* DATE PICKER */}
       <div>
-        <h2 className="text-sm font-medium mb-2">Choose Date</h2>
+        <h2 className="text-sm font-medium mb-2">
+          Choose Date
+        </h2>
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           {getNextDays().map((date) => (
@@ -85,7 +160,7 @@ export default function DoctorAppointmentPage() {
         </div>
       </div>
 
-      {/* Slots */}
+      {/* SLOTS */}
       <div>
         <h2 className="text-sm font-medium mb-3">
           Available Slots
@@ -121,10 +196,12 @@ export default function DoctorAppointmentPage() {
         </div>
       </div>
 
-      {/* Selected slot confirmation */}
+      {/* CONFIRM */}
       {selectedSlot && (
         <div className="border rounded-xl p-4 bg-sky-50">
-          <p className="text-sm mb-2">Selected Slot:</p>
+          <p className="text-sm mb-2">
+            Selected Slot:
+          </p>
 
           <p className="font-medium">
             {new Date(selectedDate).toDateString()} <br />
@@ -132,14 +209,12 @@ export default function DoctorAppointmentPage() {
           </p>
 
           <button
-            className="mt-4 w-full bg-sky-600 text-white py-2 rounded-lg font-medium hover:bg-sky-700"
+            onClick={handleConfirmAppointment}
+            disabled={loading}
+            className="mt-4 w-full bg-sky-600 text-white py-2 rounded-lg font-medium hover:bg-sky-700 disabled:opacity-50"
           >
-            Confirm Appointment
+            Proceed to Payment
           </button>
-
-          <p className="text-xs text-gray-400 mt-2 text-center">
-            Confirmation step will be added next
-          </p>
         </div>
       )}
     </div>

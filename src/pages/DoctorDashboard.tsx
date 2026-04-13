@@ -1,17 +1,15 @@
-// src/pages/doctor/DoctorDashboard.tsx
-import Sidebar from "../components/doctor/dashboard/Sidebar";
-import Topbar from "../components/doctor/dashboard/Topbar";
 import StatCard from "../components/doctor/dashboard/StatCard";
 import AppointmentsList from "../components/doctor/dashboard/AppointmentsList";
 import InfoCard from "../components/doctor/dashboard/InfoCard";
 
 export default function DoctorDashboard() {
   return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
+    <>
+    {/* // <div className="flex bg-gray-100 min-h-screen">
+    //   <Sidebar />
 
-      <main className="flex-1 p-8">
-        <Topbar />
+    //   <main className="flex-1 p-8">
+    //     <Topbar /> */}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-6 mb-8">
@@ -32,7 +30,8 @@ export default function DoctorDashboard() {
           </div>
           <InfoCard />
         </div>
-      </main>
-    </div>
+      {/* </main>
+    </div> */}
+    </>
   );
 }

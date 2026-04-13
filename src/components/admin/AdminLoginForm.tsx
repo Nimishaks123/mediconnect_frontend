@@ -7,7 +7,9 @@ import {
   loginAdmin,
   selectAuthStatus,
   selectAuthError,
+  clearError,
 } from "../../store/auth/authSlice";
+import toast from "react-hot-toast";
 
 const adminImage =
   "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80&auto=format&fit=crop";
@@ -55,7 +57,11 @@ export default function AdminLoginForm() {
     );
 
     if (loginAdmin.fulfilled.match(result)) {
+      toast.success("Admin access granted");
       navigate(ROUTES.ADMIN_DASHBOARD);
+    } else if (loginAdmin.rejected.match(result)) {
+      toast.error(result.payload as string || "Admin login failed");
+      dispatch(clearError());
     }
   };
 

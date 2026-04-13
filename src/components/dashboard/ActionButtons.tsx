@@ -25,7 +25,8 @@
 //   };
   
 //   export default ActionButtons;
-  import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../constants/routes";
 
 type Action = {
   label: string;
@@ -42,10 +43,13 @@ const ActionButtons = ({ actions }: Props) => {
 
   const handleClick = (label: string) => {
     if (label === "Find Doctor") {
-      navigate("/doctors");
+      navigate(ROUTES.DOCTORS);
     }
     if (label === "Appointments") {
-      navigate("/appointments");
+      navigate(ROUTES.PATIENT_APPOINTMENTS);
+    }
+    if (label === "Wallet") {
+      navigate(ROUTES.PATIENT_WALLET);
     }
   };
 

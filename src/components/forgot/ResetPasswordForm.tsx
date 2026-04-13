@@ -116,8 +116,6 @@ export default function ResetPasswordForm() {
       toast.success("Password reset successfully");
       navigate(ROUTES.LOGIN);
     } catch (error: unknown) {
-      console.error("Password reset failed:", error);
-
       if (axios.isAxiosError(error)) {
         toast.error(
           error.response?.data?.error ||

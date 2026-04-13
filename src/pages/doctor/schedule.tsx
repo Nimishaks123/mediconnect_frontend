@@ -7,9 +7,7 @@ import type { DoctorScheduleFormPayload } from "../../types/DoctorScheduleFormPa
 export default function DoctorSchedulePage() {
   const navigate = useNavigate();
 
-  const handleSubmit = async (
-    form: DoctorScheduleFormPayload
-  ) => {
+  const handleSubmit = async (form: DoctorScheduleFormPayload) => {
     try {
       await createDoctorSchedule({
         ...form,
@@ -18,19 +16,20 @@ export default function DoctorSchedulePage() {
 
       toast.success("Schedule saved successfully");
       navigate("/doctor/slots");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save schedule");
+    } catch {
+      toast.error("Failed to create schedule.");
     }
   };
 
   return (
-    <div className="max-w-xl bg-white p-6 rounded-xl shadow">
-      <h1 className="text-xl font-semibold mb-4">
-        Manage Schedule
-      </h1>
+    <div className="flex justify-center mt-10">
+      <div className="w-full max-w-xl bg-white p-6 rounded-xl shadow">
+        <h1 className="text-xl font-semibold mb-4 text-center">
+          Manage Schedule
+        </h1>
 
-      <ScheduleForm onSubmit={handleSubmit} />
+        <ScheduleForm onSubmit={handleSubmit} />
+      </div>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 // src/types/VerifiedDoctorApi.ts
 export type VerifiedDoctorApi = {
-  id: string;
+  doctorId: string;
+  id?: string;
+  userId: string;
   name: string;
   specialty: string;
   about: string;

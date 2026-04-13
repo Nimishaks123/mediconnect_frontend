@@ -11,6 +11,7 @@ interface DecodedToken {
   id: string;
   email: string;
   role: "PATIENT" | "DOCTOR" | "ADMIN";
+  onboardingStatus?: string;
   name?: string;
   exp?: number;
 }
@@ -44,6 +45,7 @@ export default function OAuthSuccess() {
           name: decoded.name ?? decoded.email.split("@")[0],
           email: decoded.email,
           role: decoded.role,
+          onboardingStatus: decoded.onboardingStatus,
         };
 
         // Store in localStorage
@@ -62,14 +64,18 @@ export default function OAuthSuccess() {
         // Redirect based on role
         switch (user.role) {
           case "PATIENT":
-            return navigate(ROUTES.USER_DASHBOARD, { replace: true });
+            return navigate(ROUTES.HOME, { replace: true });
           case "DOCTOR":
+            if (decoded.onboardingStatus === "APPROVED") {
+              return navigate(ROUTES.DOCTOR_DASHBOARD, { replace: true });
+            }
             return navigate(ROUTES.DOCTOR_ONBOARDING, { replace: true });
           case "ADMIN":
             return navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
+          default:
+            return navigate(ROUTES.HOME, { replace: true });
         }
       } catch (error) {
-        console.error("OAuth error:", error);
         toast.error("Google authentication failed");
         navigate(ROUTES.LOGIN, { replace: true });
       }

@@ -6,15 +6,17 @@ import { api } from "./api";
 export const getVerifiedDoctors = () =>
   api.get("/doctors/verified");
 
-// Get availability for a doctor
+
 export const getDoctorAvailability = (
   doctorId: string,
   date: string
 ) =>
-  api.get(`/doctors/${doctorId}/availability`, {
-    params: { date },
+  api.get(`/patient/doctors/slots/${doctorId}`, {
+    params: {
+      from: date,
+      to: date,
+    },
   });
-
 /* ================= APPOINTMENTS ================= */
 
 // Book appointment (PATIENT)

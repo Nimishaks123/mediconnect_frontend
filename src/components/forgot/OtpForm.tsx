@@ -192,8 +192,6 @@ export default function ForgotPasswordOtpForm() {
       setTimer(60);
       toast.success("OTP resent successfully");
     } catch (error: unknown) {
-      console.error("Failed to resend OTP", error);
-
       if (axios.isAxiosError(error)) {
         toast.error(
           error.response?.data?.error || "Failed to resend OTP"
@@ -222,8 +220,6 @@ export default function ForgotPasswordOtpForm() {
         state: { email },
       });
     } catch (error: unknown) {
-      console.error("OTP verification failed", error);
-
       if (axios.isAxiosError(error)) {
         toast.error(
           error.response?.data?.error || "Invalid OTP"

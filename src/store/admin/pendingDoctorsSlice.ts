@@ -9,23 +9,41 @@ interface PendingDoctorsState {
   loading: boolean;
   error: string | null;
   doctors: PendingDoctor[];
+  total: number;
+  pagination: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
 }
 
 const initialState: PendingDoctorsState = {
   loading: false,
   error: null,
   doctors: [],
+  total: 0,
+  pagination: {
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+    total: 0,
+  },
 };
 
-/* -------------------- FETCH PENDING DOCTORS -------------------- */
-export const fetchPendingDoctors = createAsyncThunk<
-  PendingDoctor[],
-  void,
+/* -------------------- FETCH ADMIN DOCTORS -------------------- */
+export const fetchAdminDoctors = createAsyncThunk<
+  { doctors: PendingDoctor[]; pagination: any; total: number },
+  { status: "PENDING" | "APPROVED" | "REJECTED"; page: number; limit: number; search?: string; sort?: string },
   { rejectValue: string }
->("admin/fetchPendingDoctors", async (_, { rejectWithValue }) => {
+>("admin/fetchAdminDoctors", async (params, { rejectWithValue }) => {
   try {
-    const response = await adminDoctorApi.getPendingDoctors();
-    return response.data.doctors;
+    const response = await adminDoctorApi.getAdminDoctors(params);
+    return {
+      doctors: response.data.doctors,
+      pagination: response.data.pagination,
+      total: response.data.total
+    };
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;
     return rejectWithValue(
@@ -76,15 +94,17 @@ const pendingDoctorsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // FETCH
-      .addCase(fetchPendingDoctors.pending, (state) => {
+      .addCase(fetchAdminDoctors.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPendingDoctors.fulfilled, (state, { payload }) => {
+      .addCase(fetchAdminDoctors.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.doctors = payload;
+        state.doctors = payload.doctors;
+        state.pagination = payload.pagination;
+        state.total = payload.total;
       })
-      .addCase(fetchPendingDoctors.rejected, (state, { payload }) => {
+      .addCase(fetchAdminDoctors.rejected, (state, { payload }) => {
         state.loading = false;
         state.error = payload ?? "Failed to load doctors";
       })

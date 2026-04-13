@@ -32,35 +32,36 @@ export default function Sidebar() {
       </div>
 
       {/* NAVIGATION */}
-      <nav className="space-y-2 text-base">
-        <NavLink to="/doctor" className={linkClass}>
-          🏠 Dashboard
-        </NavLink>
+     <nav className="space-y-2 text-base">
+  <NavLink to="/doctor" end className={linkClass}>
+    🏠 Dashboard
+  </NavLink>
 
-        <NavLink to="/doctor/appointments" className={linkClass}>
-          📅 Appointments
-        </NavLink>
+  <NavLink to="/doctor/appointments" className={linkClass}>
+    📅 Appointments
+  </NavLink>
 
-        <NavLink to="/doctor/schedule" className={linkClass}>
-          🗓 Manage Schedule
-        </NavLink>
+  <NavLink to="/doctor/schedule" className={linkClass}>
+    🗓 Manage Schedule
+  </NavLink>
 
-        <NavLink to="/doctor/slots" className={linkClass}>
-          ⏱ View Slots
-        </NavLink>
+  <NavLink to="/doctor/slots" className={linkClass}>
+    ⏱ View Slots
+  </NavLink>
 
-        <NavLink to="/doctor/patients" className={linkClass}>
-          🧑‍🤝‍🧑 Patients
-        </NavLink>
+  <NavLink to="/doctor/patients" className={linkClass}>
+    🧑‍🤝‍🧑 Patients
+  </NavLink>
 
-        <NavLink to="/doctor/wallet" className={linkClass}>
-          💳 Wallet
-        </NavLink>
+  <NavLink to="/doctor/wallet" className={linkClass}>
+    💳 Wallet
+  </NavLink>
 
-        <NavLink to="/doctor/profile" className={linkClass}>
-          👤 Profile
-        </NavLink>
-      </nav>
+  <NavLink to="/doctor/profile" className={linkClass}>
+    👤 Profile
+  </NavLink>
+</nav>
+
     </aside>
   );
 }

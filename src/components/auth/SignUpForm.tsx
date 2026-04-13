@@ -117,7 +117,7 @@ export default function SignUpForm() {
 
   //  Google signup using navigation 
   const handleGoogleSignup = () => {
-    navigate("/auth/google-start");
+    navigate("/auth/google-start?role=" + userType.toLowerCase());
   };
 
   return (

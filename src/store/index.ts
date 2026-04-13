@@ -7,6 +7,9 @@ import adminUserReducer from "./admin/adminUserSlice";
 import pendingDoctorsReducer from "./admin/pendingDoctorsSlice";
 import doctorReducer from "./doctor/doctorSlice";
 import appointmentReducer from "./appointments/appointmentSlice"
+import patientReducer from "./patient/patientSlice";
+import notificationReducer from "./notification/notificationSlice";
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -15,7 +18,9 @@ export const store = configureStore({
     adminUsers: adminUserReducer,
     pendingDoctors: pendingDoctorsReducer,
         doctor: doctorReducer, 
-         appointments: appointmentReducer,
+    appointments: appointmentReducer,
+    patient: patientReducer,
+    notifications: notificationReducer,
   },
 });
 

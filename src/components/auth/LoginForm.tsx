@@ -6,8 +6,10 @@ import {
   loginUser,
   selectAuthStatus,
   selectAuthError,
+  clearError,
 } from "../../store/auth/authSlice";
 import { loginSchema } from "../../validation/loginSchema";
+import toast from "react-hot-toast";
 
 const doctorImage =
   "https://images.unsplash.com/photo-1550831107-1553da8c8464?w=900&q=80&auto=format&fit=crop";
@@ -58,18 +60,34 @@ export default function LoginForm() {
 
   if (loginUser.fulfilled.match(result)) {
     const { user } = result.payload;
+    toast.success("Welcome back, " + user.name + "!");
 
     if (user.role === "PATIENT") {
-      navigate(ROUTES.USER_DASHBOARD);
+      navigate(ROUTES.HOME);
     } else if (user.role === "DOCTOR") {
-      navigate(ROUTES.DOCTOR_DASHBOARD);
+      if (user.onboardingStatus === "APPROVED") {
+        navigate(ROUTES.DOCTOR_DASHBOARD);
+      } else {
+        navigate(ROUTES.DOCTOR_ONBOARDING);
+      }
     } else if (user.role === "ADMIN") {
       navigate(ROUTES.ADMIN_DASHBOARD);
     } else {
-      navigate(ROUTES.USER_DASHBOARD);
+      navigate(ROUTES.HOME);
     }
+  } else if (loginUser.rejected.match(result)) {
+     toast.error(result.payload as string || "Login failed");
+     dispatch(clearError());
   }
 };
+
+  const handlePatientGoogleLogin = () => {
+    navigate("/auth/google-start?role=patient");
+  };
+
+  const handleDoctorGoogleLogin = () => {
+    navigate("/auth/google-start?role=doctor");
+  };
 
 
   return (
@@ -164,9 +182,73 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
             >
               {isSubmitting ? "Signing In..." : "Log In"}
+            </button>
+
+            {/* PATIENT GOOGLE BUTTON */}
+            <button
+              type="button"
+              onClick={handlePatientGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 border py-3 rounded-lg font-semibold bg-white hover:bg-gray-100"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.9 0-12.5-5.6-12.5-12.5S17.1 11 24 11c3.2 0 6.2 1.2 8.5 3.3L38 8.8C34.3 5.4 29.4 3.5 24 3.5 12.6 3.5 3.5 12.6 3.5 24S12.6 44.5 24 44.5 44.5 35.4 44.5 24c0-1.1-.1-2.3-.3-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7L12.7 19.4C14.2 15.4 18.2 12.4 24 12.4c3.2 0 6.2 1.2 8.5 3.3L38 8.8C34.3 5.4 29.4 3.5 24 3.5 16.1 3.5 9.2 7.9 6.3 14.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44.5c5.4 0 10.3-1.9 14.1-5.1l-5.9-4.9c-2.3 2.1-5.3 3.3-8.5 3.3-5.3 0-9.7-3.4-11.3-8l-6.4 4.7C9.2 41.1 16.1 44.5 24 44.5z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2 3.8-3.7 5.1l5.9 4.9C41.9 34.3 44.5 29.5 44.5 24c0-1.1-.1-2.3-.3-3.5z"
+                />
+              </svg>
+              Continue as Patient
+            </button>
+
+            {/* DOCTOR GOOGLE BUTTON */}
+            <button
+              type="button"
+              onClick={handleDoctorGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 border py-3 rounded-lg font-semibold bg-white hover:bg-gray-100"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.9 0-12.5-5.6-12.5-12.5S17.1 11 24 11c3.2 0 6.2 1.2 8.5 3.3L38 8.8C34.3 5.4 29.4 3.5 24 3.5 12.6 3.5 3.5 12.6 3.5 24S12.6 44.5 24 44.5 44.5 35.4 44.5 24c0-1.1-.1-2.3-.3-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7L12.7 19.4C14.2 15.4 18.2 12.4 24 12.4c3.2 0 6.2 1.2 8.5 3.3L38 8.8C34.3 5.4 29.4 3.5 24 3.5 16.1 3.5 9.2 7.9 6.3 14.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44.5c5.4 0 10.3-1.9 14.1-5.1l-5.9-4.9c-2.3 2.1-5.3 3.3-8.5 3.3-5.3 0-9.7-3.4-11.3-8l-6.4 4.7C9.2 41.1 16.1 44.5 24 44.5z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.7 2-2 3.8-3.7 5.1l5.9 4.9C41.9 34.3 44.5 29.5 44.5 24c0-1.1-.1-2.3-.3-3.5z"
+                />
+              </svg>
+              Continue as Doctor
             </button>
           </form>
 

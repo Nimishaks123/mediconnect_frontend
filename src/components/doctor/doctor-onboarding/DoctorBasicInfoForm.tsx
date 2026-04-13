@@ -12,7 +12,6 @@ interface Props {
 }
 
 export default function DoctorBasicInfoForm({
-  userId,
   onSuccess,
 }: Props) {
   const [form, setForm] = useState({

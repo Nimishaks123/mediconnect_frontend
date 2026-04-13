@@ -7,10 +7,15 @@ const DEFAULT_AVATAR =
 
 export const mapDoctorFromApi = (
   d: VerifiedDoctorApi
-): Doctor => ({
-  id: d.id,
-  name: d.name,
-  specialty: d.specialty,
-  about: d.about,
-  photo: d.photo?.trim() ? d.photo : DEFAULT_AVATAR,
-});
+): Doctor => {
+  const doctorWithId = d as VerifiedDoctorApi & { id?: string };
+  return {
+    doctorId: d.doctorId || doctorWithId.id,
+    id: d.id,
+    userId: d.userId,
+    name: d.name,
+    specialty: d.specialty,
+    about: d.about,
+    photo: d.photo?.trim() ? d.photo : DEFAULT_AVATAR,
+  };
+};

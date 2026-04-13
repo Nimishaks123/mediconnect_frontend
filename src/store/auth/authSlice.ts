@@ -19,6 +19,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: Role;
+  onboardingStatus?: string;
 }
 
 interface AuthState {
@@ -32,6 +33,7 @@ interface JwtPayload {
   name?: string;
   email: string;
   role: Role;
+  onboardingStatus?: string;
   exp?: number;
 }
 
@@ -133,11 +135,27 @@ const authSlice = createSlice({
     const token = action.payload;
     const decoded = jwtDecode<JwtPayload>(token);
 
+    // 🟦 FIX: Don't revert status on refresh if localStorage has a newer one
+    const storedUserStr = localStorage.getItem("currentUser");
+    let onboardingStatus = decoded.onboardingStatus;
+
+    if (storedUserStr) {
+      try {
+        const storedUser = JSON.parse(storedUserStr);
+        if (storedUser.id === decoded.id && storedUser.onboardingStatus) {
+          onboardingStatus = storedUser.onboardingStatus;
+        }
+      } catch (e) {
+        // ignore parse error
+      }
+    }
+
     state.user = {
       id: decoded.id,
       name: decoded.name ?? "",
       email: decoded.email,
       role: decoded.role,
+      onboardingStatus,
     };
 
     state.accessToken = token;
@@ -152,7 +170,15 @@ const authSlice = createSlice({
   }
 },
 
-  
+    setOnboardingStatus: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.onboardingStatus = action.payload;
+        localStorage.setItem("currentUser", JSON.stringify(state.user));
+      }
+    },
+  clearError: (state) => {
+    state.error = null;
+  },
 },
   
 
@@ -191,7 +217,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { updateAccessToken, logout,setCredentials,loginSuccess,loadUserFromToken } = authSlice.actions;
+export const { updateAccessToken, logout, setCredentials, loginSuccess, loadUserFromToken, setOnboardingStatus, clearError } = authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.auth;
 export const selectCurrentUser = (state: RootState) => state.auth.user;

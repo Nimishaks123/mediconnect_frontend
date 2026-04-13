@@ -1,30 +1,29 @@
 import { z } from "zod";
 
 export const doctorBasicInfoSchema = z.object({
-  specialty: z.string().min(1, "Specialty is required"),
+  specialty: z.string().trim().min(2, "Specialty must be at least 2 characters"),
 
-  qualification: z.string().min(1, "Qualification is required"),
+  qualification: z.string().trim().min(2, "Qualification must be at least 2 characters"),
 
-  experience: z.string().min(1, "Experience is required")
+  experience: z.string().trim().min(1, "Experience is required")
     .transform(Number)
-    .refine((v) => !isNaN(v) && v >= 0, {
-      message: "Experience must be 0 or more",
+    .refine((v) => !isNaN(v) && v >= 0 && v <= 60, {
+      message: "Experience must be between 0 and 60",
     }),
 
   consultationFee: z
     .string()
+    .trim()
     .min(1, "Consultation fee is required")
     .transform(Number)
-    .refine((v) => !isNaN(v), {
-      message: "Consultation fee must be a number",
-    })
-    .refine((v) => v > 0, {
-      message: "Consultation fee must be greater than 0",
+    .refine((v) => !isNaN(v) && v >= 100 && v <= 10000, {
+      message: "Fee must be between ₹100 and ₹10000",
     }),
 
-  registrationNumber: z.string().min(1, "Registration number is required"),
+  registrationNumber: z.string().trim().min(5, "Registration number must be at least 5 characters")
+    .regex(/^[A-Z0-9-]+$/, "Register number must be alphanumeric or hyphen (Uppercase only)"),
 
-  aboutMe: z.string().min(10, "About me must be at least 10 characters"),
+  aboutMe: z.string().trim().min(20, "About me must be at least 20 characters").max(500, "Maximum 500 characters allowed"),
 });
 
 export type DoctorBasicInfoData = z.infer<typeof doctorBasicInfoSchema>;

@@ -30,7 +30,23 @@ export interface PendingDoctor {
 }
 
 export const adminDoctorApi = {
-  getPendingDoctors: () => api.get<{ count: number; doctors: PendingDoctor[] }>("/admin/pending-doctors"),
+  getAdminDoctors: (params: { 
+    status: string;
+    page: number; 
+    limit: number; 
+    search?: string; 
+    sort?: string 
+  }) => 
+    api.get<{ 
+      total: number; 
+      doctors: PendingDoctor[];
+      pagination: {
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      }
+    }>("/admin/doctors", { params }),
 
   approveDoctor: (userId: string) =>
     api.post("/admin/approve-doctor", { userId }),

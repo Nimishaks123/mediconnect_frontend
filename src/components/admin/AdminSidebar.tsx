@@ -38,7 +38,8 @@ import {
   HiHome,
   HiClipboardList,
   HiUserGroup,
-  HiBan,
+  HiCalendar,
+  HiCreditCard,
 } from "react-icons/hi";
 
 export const AdminSidebar = () => {
@@ -74,6 +75,30 @@ export const AdminSidebar = () => {
         </NavLink>
 
         <NavLink
+          to="/admin/appointments"
+          className={({ isActive }) =>
+            `flex items-center gap-3 p-3 rounded-md ${
+              isActive ? "bg-blue-100 text-blue-600" : "text-gray-700"
+            }`
+          }
+        >
+          <HiCalendar />
+          Appointments
+        </NavLink>
+
+        <NavLink
+          to="/admin/wallets"
+          className={({ isActive }) =>
+            `flex items-center gap-3 p-3 rounded-md ${
+              isActive ? "bg-blue-100 text-blue-600" : "text-gray-700"
+            }`
+          }
+        >
+          <HiCreditCard />
+          Wallets
+        </NavLink>
+
+        <NavLink
           to="/admin/users"
           className={({ isActive }) =>
             `flex items-center gap-3 p-3 rounded-md ${
@@ -83,18 +108,6 @@ export const AdminSidebar = () => {
         >
           <HiUserGroup />
           Users
-        </NavLink>
-
-        <NavLink
-          to="/admin/blocked-users"
-          className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-md ${
-              isActive ? "bg-blue-100 text-blue-600" : "text-gray-700"
-            }`
-          }
-        >
-          <HiBan />
-          Blocked Users
         </NavLink>
       </nav>
     </aside>

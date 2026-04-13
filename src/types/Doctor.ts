@@ -1,6 +1,8 @@
 
 export type Doctor = {
-  id: string;
+  doctorId: string;
+  id?: string;
+  userId: string; 
   name: string;
   specialty: string;
   about: string;

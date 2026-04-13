@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAppSelector } from "../../store/hooks";
 import { selectCurrentUser } from "../../store/auth/authSlice";
 import { doctorOnboardingApi } from "../../api/doctorOnboardingApi";
+import { toast } from "react-hot-toast";
 
 import DoctorBasicInfoForm from "./DoctorBasicInfoForm";
 import DoctorDocumentsForm from "../../components/doctor/doctor-onboarding/DoctorDocumentsForm";
@@ -33,58 +34,61 @@ export default function DoctorOnboarding() {
 
   //       setDoctorId(id);
   //       setStep(1);
-  //     } catch (err) {
-  //       console.error("Onboarding init error", err);
-  //     } finally {
-  //       setLoading(false);
+  //     } catch {
+  //       toast.error("Failed to reschedule appointment.");
   //     }
   //   };
 
   //   init();
   // }, [currentUser]);
   useEffect(() => {
-  const init = async () => {
-    if (!currentUser?.id) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // 1️⃣ Ensure doctor exists (idempotent)
-      const startRes = await doctorOnboardingApi.startOnboarding();
-      const doctor = startRes.data.doctor;
-
-      setDoctorId(doctor.userId);
-
-      switch (doctor.onboardingStatus) {
-        case "BASIC_INFO":
-          setStep(1);
-          break;
-
-        case "DOCUMENTS_PENDING":
-          setStep(2);
-          break;
-
-        case "SUBMITTED":
-        case "APPROVED":
-        case "REJECTED":
-          setStep(3);
-          break;
-
-        default:
-          setStep(1);
+    const init = async () => {
+      if (!currentUser?.id) {
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      console.error("Onboarding init error", err);
-    } finally {
+
+      // 🟦 FIX: If status is already final, don't run init (ProtectedRoute will redirect)
+      if (currentUser.onboardingStatus === "SUBMITTED" || 
+          currentUser.onboardingStatus === "REJECTED" || 
+          currentUser.onboardingStatus === "APPROVED") {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // 1️⃣ Ensure doctor exists (idempotent)
+        const startRes = await doctorOnboardingApi.startOnboarding();
+        const doctor = startRes.data.doctor;
+
+        setDoctorId(doctor.userId);
+
+        switch (doctor.onboardingStatus) {
+          case "BASIC_INFO":
+            setStep(1);
+            break;
+
+          case "DOCUMENTS_PENDING":
+            setStep(2);
+            break;
+
+          case "SUBMITTED":
+          case "APPROVED":
+          case "REJECTED":
+            setStep(3);
+            break;
+
+          default:
+            setStep(1);
+        }
+      } catch {
+        toast.error("Failed to initialize. Please try again.");
+      }
       setLoading(false);
-    }
-  };
+    };
 
-  init();
-}, [currentUser]);
-
-
+    init();
+  }, [currentUser]);
 
   if (loading) return <p>Loading…</p>;
   if (!doctorId) return <p>Error: Doctor ID missing.</p>;
@@ -99,7 +103,7 @@ export default function DoctorOnboarding() {
         <DoctorDocumentsForm userId={doctorId} onNext={() => setStep(3)} />
       )}
 
-      {step === 3 && <DoctorReviewSubmit userId={doctorId} />}
+      {step === 3 && <DoctorReviewSubmit />}
     </div>
   );
 }

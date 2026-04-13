@@ -6,7 +6,6 @@ import {
   unblockUser,
 } from "../store/admin/adminUserSlice";
 import toast from "react-hot-toast";
-import Header from "../components/layout/Header";
 
 export default function AdminUsersPage() {
   const dispatch = useAppDispatch();
@@ -51,8 +50,7 @@ export default function AdminUsersPage() {
 
   /* -------------------- UI -------------------- */
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="bg-gray-50">
 
       <div className="max-w-7xl mx-auto p-6">
         {/* HEADER */}
@@ -291,7 +289,7 @@ export default function AdminUsersPage() {
                 ).unwrap();
                 toast.success("User unblocked successfully");
               }
-            } catch (error) {
+            } catch {
               toast.error("Action failed. Please try again.");
             } finally {
               setConfirmAction(null);
