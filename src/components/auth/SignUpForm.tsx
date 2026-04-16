@@ -3,7 +3,7 @@ import { useState } from "react";
 import { api } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
-import toast from "react-hot-toast";
+import { showError, showSuccess } from "../../utils/toastUtils";
 import { z } from "zod";
 
 // ------------------- ZOD VALIDATION SCHEMA -------------------
@@ -83,7 +83,7 @@ export default function SignUpForm() {
     e.preventDefault();
 
     if (!validate()) {
-      toast.error("Please fix the errors before submitting.");
+      showError("Please fix the errors before submitting.");
       return;
     }
 
@@ -98,7 +98,7 @@ export default function SignUpForm() {
 
       const response = await api.post("/auth/signup", payload);
 
-      toast.success(response.data.message || "Signup successful!");
+      showSuccess(response.data.message || "Signup successful!");
 
       localStorage.setItem("signupEmail", payload.email);
       localStorage.setItem("signupPassword", payload.password);
@@ -111,7 +111,7 @@ export default function SignUpForm() {
         axiosErr.response?.data?.error ||
         axiosErr.response?.data?.message ||
         "Signup failed";
-      toast.error(backendMsg);
+      showError(backendMsg);
     }
   };
 

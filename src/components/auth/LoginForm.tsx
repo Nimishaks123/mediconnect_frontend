@@ -9,7 +9,7 @@ import {
   clearError,
 } from "../../store/auth/authSlice";
 import { loginSchema } from "../../validation/loginSchema";
-import toast from "react-hot-toast";
+import { showSuccess, showError } from "../../utils/toastUtils";
 
 const doctorImage =
   "https://images.unsplash.com/photo-1550831107-1553da8c8464?w=900&q=80&auto=format&fit=crop";
@@ -60,7 +60,7 @@ export default function LoginForm() {
 
   if (loginUser.fulfilled.match(result)) {
     const { user } = result.payload;
-    toast.success("Welcome back, " + user.name + "!");
+    showSuccess("Welcome back, " + user.name + "!");
 
     if (user.role === "PATIENT") {
       navigate(ROUTES.HOME);
@@ -76,7 +76,7 @@ export default function LoginForm() {
       navigate(ROUTES.HOME);
     }
   } else if (loginUser.rejected.match(result)) {
-     toast.error(result.payload as string || "Login failed");
+     showError(result.payload as string || "Login failed");
      dispatch(clearError());
   }
 };

@@ -1,1 +1,6 @@
-@import "tailwindcss"
+@import "tailwindcss";
+
+@theme {
+  --color-mediconnect-green: #0ea5e9;
+  --color-mediconnect-green-dark: #0284c7;
+}

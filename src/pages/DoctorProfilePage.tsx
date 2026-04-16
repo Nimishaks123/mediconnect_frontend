@@ -3,7 +3,7 @@ import { useAppSelector } from "../store/hooks";
 import { selectCurrentUser } from "../store/auth/authSlice";
 import { doctorOnboardingApi } from "../api/doctorOnboardingApi";
 import { uploadApi } from "../api/uploadApi";
-import { toast } from "react-hot-toast";
+import { showSuccess, showError, showLoading, dismissToast } from "../utils/toastUtils";
 import { 
   UserIcon, 
   AcademicCapIcon, 
@@ -55,7 +55,7 @@ export default function DoctorProfilePage() {
         profilePhoto: doc.profilePhoto || ""
       });
     } catch (err) {
-      toast.error("Failed to load doctor profile");
+      showError("Failed to load doctor profile");
     } finally {
       setLoading(false);
     }
@@ -72,19 +72,19 @@ export default function DoctorProfilePage() {
 
     // 1️⃣ Validate: ONLY Image
     if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
+      showError("Please upload an image file");
       return;
     }
 
     // 2️⃣ Validate: Max 2MB
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error("Profile photo must be smaller than 2MB");
+      showError("Profile photo must be smaller than 2MB");
       return;
     }
 
     setUploadingPhoto(true);
-    const loadingToast = toast.loading("Uploading new photo...");
+    const loadingToast = showLoading("Uploading new photo...");
 
     try {
       // 3️⃣ DIRECT UPLOAD to Cloudinary
@@ -100,9 +100,9 @@ export default function DoctorProfilePage() {
       setProfile((prev: any) => ({ ...prev, profilePhoto: imageUrl }));
       setEditForm((prev: any) => ({ ...prev, profilePhoto: imageUrl }));
       
-      toast.success("Profile photo updated!", { id: loadingToast });
+      showSuccess("Profile photo updated!", loadingToast);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Upload failed", { id: loadingToast });
+      showError(err.response?.data?.message || "Upload failed", loadingToast);
     } finally {
       setUploadingPhoto(false);
     }
@@ -113,26 +113,26 @@ export default function DoctorProfilePage() {
     
     // Validations
     if (editForm.aboutMe.length < 20) {
-      toast.error("About Me must be at least 20 characters");
+      showError("About Me must be at least 20 characters");
       return;
     }
     if (editForm.experience < 0 || editForm.experience > 60) {
-      toast.error("Experience must be between 0 and 60 years");
+      showError("Experience must be between 0 and 60 years");
       return;
     }
     if (editForm.consultationFee < 100 || editForm.consultationFee > 10000) {
-      toast.error("Fee must be between ₹100 and ₹10000");
+      showError("Fee must be between ₹100 and ₹10000");
       return;
     }
 
     setUpdating(true);
     try {
       await doctorOnboardingApi.updateBasicInfo(editForm);
-      toast.success("Profile updated successfully");
+      showSuccess("Profile updated successfully");
       setIsEditing(false);
       fetchProfile();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      showError(err.response?.data?.message || "Failed to update profile");
     } finally {
       setUpdating(false);
     }

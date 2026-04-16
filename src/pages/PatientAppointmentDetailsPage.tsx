@@ -15,6 +15,8 @@ interface Appointment {
   refundAmount: number;
   cancellationCharge: number;
   doctor?: {
+    id: string;
+    userId: string;
     name: string;
     specialty: string;
     profilePhoto: string | null;
@@ -241,7 +243,7 @@ export default function PatientAppointmentDetailsPage() {
           </div>
 
           <div className="space-y-6 flex flex-col h-full">
-            <div className="bg-gradient-to-br from-indigo-900 to-indigo-700 rounded-2xl p-6 shadow-lg shadow-indigo-200 flex flex-col items-center justify-center text-center flex-1">
+            <div className="bg-gradient-to-br from-indigo-900 to-indigo-700 rounded-2xl p-6 shadow-lg shadow-indigo-200 flex flex-col items-center justify-center text-center">
               <span className="text-4xl mb-3">📹</span>
               <h3 className="text-white font-bold text-lg mb-1">Teleconsultation</h3>
               <p className="text-indigo-200 text-sm mb-6 max-w-[200px]">
@@ -261,6 +263,16 @@ export default function PatientAppointmentDetailsPage() {
                 {canStartVideoCall() ? "Join Video Call" : "Call Locked"}
               </button>
             </div>
+
+            {appointment.doctor?.userId && (
+              <button 
+                onClick={() => navigate(`/chat/${appointment.id}`)}
+                className="w-full py-4 bg-sky-50 text-sky-600 font-black uppercase text-xs tracking-widest rounded-2xl border-2 border-dashed border-sky-200 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:shadow-xl hover:shadow-sky-100 transition-all flex items-center justify-center gap-3 active:scale-95 group"
+              >
+                <span className="text-xl group-hover:animate-bounce">💬</span>
+                Open Secure Consultation Chat
+              </button>
+            )}
 
             {canCancel && (
               <div className="bg-red-50 rounded-2xl border border-red-100 p-5">

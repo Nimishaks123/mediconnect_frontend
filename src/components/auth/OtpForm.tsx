@@ -4,7 +4,7 @@ import { ROUTES } from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 import { useAppDispatch } from "../../store/hooks";
-import { loginSuccess } from "../../store/auth/authSlice";
+import { setCredentials } from "../../store/auth/authSlice";
 import type { AxiosError } from "axios";
 import toast from "react-hot-toast";
 
@@ -78,9 +78,7 @@ export default function OtpForm() {
       const token = loginRes.data.accessToken;
 
       
-      dispatch(loginSuccess({ user: loggedInUser, accessToken: token }));
-      localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
-      localStorage.setItem("accessToken", token);
+      dispatch(setCredentials({ user: loggedInUser, accessToken: token }));
 
       localStorage.removeItem("signupEmail");
       localStorage.removeItem("signupPassword");

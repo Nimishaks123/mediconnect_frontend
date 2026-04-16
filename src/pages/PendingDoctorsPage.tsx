@@ -88,7 +88,7 @@ export default function PendingDoctorsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-              DOCTOR <span className="text-blue-600">VERIFICATION</span>
+              Doctor <span className="text-blue-600">Verification</span>
             </h1>
             <p className="text-gray-500 font-medium mt-1 uppercase text-xs tracking-[0.2em]">Review and manage medical professionals</p>
           </div>

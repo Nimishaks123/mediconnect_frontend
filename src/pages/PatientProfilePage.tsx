@@ -5,7 +5,7 @@ import {
   createPatientProfile,
   updatePatientProfile,
 } from "../store/patient/patientSlice";
-import { toast } from "react-hot-toast";
+import { showSuccess, showError } from "../utils/toastUtils";
 import {
   UserIcon,
   PhoneIcon,
@@ -50,9 +50,9 @@ const PatientProfilePage: React.FC = () => {
       const imageUrl = await uploadApi.uploadToCloudinary(file, signatureResponse.data);
       
       setFormData((prev: any) => ({ ...prev, profileImage: imageUrl }));
-      toast.success("Image uploaded successfully");
+      showSuccess("Image uploaded successfully");
     } catch (err) {
-      toast.error("Failed to upload image");
+      showError("Failed to upload image");
       console.error(err);
     } finally {
       setIsUploading(false);
@@ -107,13 +107,13 @@ const PatientProfilePage: React.FC = () => {
     
     // Validate Primary Phone
     if (!phoneRegex.test(formData.phone)) {
-      toast.error("Enter a valid 10-digit primary phone number starting with 6-9");
+      showError("Enter a valid 10-digit primary phone number starting with 6-9");
       return;
     }
 
     // Validate Status/Existence
     if (!formData.name || !formData.dateOfBirth) {
-      toast.error("Name and Date of Birth are mandatory fields");
+      showError("Name and Date of Birth are mandatory fields");
       return;
     }
 
@@ -121,13 +121,13 @@ const PatientProfilePage: React.FC = () => {
     const dob = new Date(formData.dateOfBirth);
     const today = new Date();
     if (dob > today) {
-      toast.error("Date of Birth cannot be in the future");
+      showError("Date of Birth cannot be in the future");
       return;
     }
 
     // Validate Emergency Contact Phone
     if (formData.emergencyContactPhone && !phoneRegex.test(formData.emergencyContactPhone)) {
-      toast.error("Enter a valid 10-digit emergency contact phone number starting with 6-9");
+      showError("Enter a valid 10-digit emergency contact phone number starting with 6-9");
       return;
     }
 
@@ -140,14 +140,14 @@ const PatientProfilePage: React.FC = () => {
     try {
       if (profile) {
         await dispatch(updatePatientProfile(payload)).unwrap();
-        toast.success("Profile updated successfully");
+        showSuccess("Profile updated successfully");
       } else {
         await dispatch(createPatientProfile(payload)).unwrap();
-        toast.success("Profile created successfully");
+        showSuccess("Profile created successfully");
       }
       setIsEditing(false);
     } catch (err: any) {
-      toast.error(err || "An error occurred");
+      showError(err || "An error occurred");
     }
   };
 

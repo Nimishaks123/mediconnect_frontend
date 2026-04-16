@@ -27,7 +27,9 @@ interface AuthState {
   accessToken: string | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  isInitialized: boolean;
 }
+
 interface JwtPayload {
   id: string;
   name?: string;
@@ -37,12 +39,24 @@ interface JwtPayload {
   exp?: number;
 }
 
+const getInitialUser = (): AuthUser | null => {
+  const storedUser = localStorage.getItem("currentUser");
+  if (!storedUser) return null;
+  try {
+    return JSON.parse(storedUser);
+  } catch {
+    return null;
+  }
+};
+
 const initialState: AuthState = {
-  user: null,
+  user: getInitialUser(),
   accessToken: localStorage.getItem("accessToken"),
   status: "idle",
   error: null,
+  isInitialized: false,
 };
+
 export const loginUser = createAsyncThunk<
   { user: AuthUser; accessToken: string; remember: boolean },
   { email: string; password: string; remember: boolean },
@@ -67,8 +81,6 @@ export const loginUser = createAsyncThunk<
   }
 });
 
-
-
 export const loginAdmin = createAsyncThunk<
   { admin: AuthUser; accessToken: string },
   { email: string; password: string },
@@ -84,25 +96,22 @@ export const loginAdmin = createAsyncThunk<
     return { admin, accessToken };
    } catch (error: unknown) {
   const axiosErr = error as AxiosError<{ message: string }>;
-
-  const msg =
-    axiosErr.response?.data?.message || "Admin login failed";
-
+  const msg = axiosErr.response?.data?.message || "Admin login failed";
   return rejectWithValue(msg);
 }
-
 });
-
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setInitialized: (state) => {
+      state.isInitialized = true;
+    },
     updateAccessToken: (state, action: PayloadAction<string>) => {
       state.accessToken = action.payload;
       localStorage.setItem("accessToken", action.payload);
     },
-
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
@@ -113,77 +122,70 @@ const authSlice = createSlice({
       localStorage.removeItem("accessToken");
       localStorage.removeItem("rememberedEmail");
     },
-      setCredentials: (
-    state,
-    action: PayloadAction<{ user: AuthUser; accessToken: string }>
-  ) => {
-    state.user = action.payload.user;
-    state.accessToken = action.payload.accessToken;
+    setCredentials: (
+      state,
+      action: PayloadAction<{ user: AuthUser; accessToken: string }>
+    ) => {
+      state.user = action.payload.user;
+      state.accessToken = action.payload.accessToken;
+      state.status = "succeeded";
 
-    localStorage.setItem("currentUser", JSON.stringify(action.payload.user));
-    localStorage.setItem("accessToken", action.payload.accessToken);
-  },
-    loginSuccess: (
-    state,
-    action: PayloadAction<{ user: AuthUser; accessToken: string }>
-  ) => {
-    state.user = action.payload.user;
-    state.accessToken = action.payload.accessToken;
-  },
-  loadUserFromToken: (state, action: PayloadAction<string>) => {
-  try {
-    const token = action.payload;
-    const decoded = jwtDecode<JwtPayload>(token);
-
-    // 🟦 FIX: Don't revert status on refresh if localStorage has a newer one
-    const storedUserStr = localStorage.getItem("currentUser");
-    let onboardingStatus = decoded.onboardingStatus;
-
-    if (storedUserStr) {
+      localStorage.setItem("currentUser", JSON.stringify(action.payload.user));
+      localStorage.setItem("accessToken", action.payload.accessToken);
+    },
+    loadUserFromToken: (state, action: PayloadAction<string>) => {
       try {
-        const storedUser = JSON.parse(storedUserStr);
-        if (storedUser.id === decoded.id && storedUser.onboardingStatus) {
-          onboardingStatus = storedUser.onboardingStatus;
+        const token = action.payload;
+        const decoded = jwtDecode<JwtPayload>(token);
+
+        // Check expiration
+        const now = Date.now() / 1000;
+        if (decoded.exp && decoded.exp < now) {
+          throw new Error("Token expired");
         }
-      } catch (e) {
-        // ignore parse error
+
+        const storedUserStr = localStorage.getItem("currentUser");
+        let onboardingStatus = decoded.onboardingStatus;
+
+        if (storedUserStr) {
+          try {
+            const storedUser = JSON.parse(storedUserStr);
+            if (storedUser.id === decoded.id && storedUser.onboardingStatus) {
+              onboardingStatus = storedUser.onboardingStatus;
+            }
+          } catch (e) {}
+        }
+
+        state.user = {
+          id: decoded.id,
+          name: decoded.name ?? "",
+          email: decoded.email,
+          role: decoded.role,
+          onboardingStatus,
+        };
+
+        state.accessToken = token;
+        state.isInitialized = true;
+      } catch (error) {
+        state.user = null;
+        state.accessToken = null;
+        state.isInitialized = true;
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("currentUser");
       }
-    }
-
-    state.user = {
-      id: decoded.id,
-      name: decoded.name ?? "",
-      email: decoded.email,
-      role: decoded.role,
-      onboardingStatus,
-    };
-
-    state.accessToken = token;
-
-    // Token is the source of truth
-  } catch {
-    state.user = null;
-    state.accessToken = null;
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("currentUser");
-  }
-},
-
+    },
     setOnboardingStatus: (state, action: PayloadAction<string>) => {
       if (state.user) {
         state.user.onboardingStatus = action.payload;
         localStorage.setItem("currentUser", JSON.stringify(state.user));
       }
     },
-  clearError: (state) => {
-    state.error = null;
+    clearError: (state) => {
+      state.error = null;
+    },
   },
-},
-  
-
   extraReducers: (builder) => {
-  
     builder
       .addCase(loginUser.pending, (state) => {
         state.status = "loading";
@@ -193,12 +195,12 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.isInitialized = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload ?? "Login failed";
       });
-
 
     builder
       .addCase(loginAdmin.pending, (state) => {
@@ -209,6 +211,7 @@ const authSlice = createSlice({
         state.status = "succeeded";
         state.user = action.payload.admin;
         state.accessToken = action.payload.accessToken;
+        state.isInitialized = true;
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "failed";
@@ -217,12 +220,20 @@ const authSlice = createSlice({
   },
 });
 
-export const { updateAccessToken, logout, setCredentials, loginSuccess, loadUserFromToken, setOnboardingStatus, clearError } = authSlice.actions;
+export const { 
+  updateAccessToken, 
+  logout, 
+  setCredentials, 
+  loadUserFromToken, 
+  setOnboardingStatus, 
+  clearError,
+  setInitialized 
+} = authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.auth;
 export const selectCurrentUser = (state: RootState) => state.auth.user;
 export const selectAuthStatus = (state: RootState) => state.auth.status;
 export const selectAuthError = (state: RootState) => state.auth.error;
-
+export const selectIsInitialized = (state: RootState) => state.auth.isInitialized;
 
 export default authSlice.reducer;

@@ -36,8 +36,18 @@ export default function DoctorAppointmentsPage() {
   const loadAppointments = async () => {
     try {
       const res = await getDoctorAppointments();
-      setGroupedAppointments(res.data);
-    } catch {
+      console.log("Appointments API:", res);
+      // Handle both structured { data: ... } and direct responses
+      const data = res?.data || res;
+      if (data && typeof data === 'object') {
+        setGroupedAppointments({
+          upcoming: data.upcoming || [],
+          past: data.past || [],
+          recent: data.recent || [],
+        });
+      }
+    } catch (error) {
+      console.error("Load Error:", error);
       toast.error("Failed to load your appointments.");
     } finally {
       setLoading(false);
@@ -133,16 +143,34 @@ export default function DoctorAppointmentsPage() {
                 <div className="flex-1 space-y-1">
                    <div className="flex items-center gap-3">
                       <h3 className="text-2xl font-bold text-gray-900">{app.patientName}</h3>
-                      {app.videoCallAvailable && (
+                      <div className="flex gap-2">
+                        {app.videoCallAvailable && (
+                          <button 
+                            className="p-2 bg-sky-600 text-white rounded-xl hover:bg-sky-700 transition-all hover:scale-110 shadow-lg shadow-sky-200"
+                            title="Start Video Consultation"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Video logic here
+                            }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+                              <path d="M240,128a15.89,15.89,0,0,1-8.15,13.93l-48,26.47A16,16,0,0,1,160,174.45V184a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V72A16,16,0,0,1,32,56H144a16,16,0,0,1,16,16V81.55a16,16,0,0,1,23.85-13.95l48,26.47A15.89,15.89,0,0,1,240,128Z"></path>
+                            </svg>
+                          </button>
+                        )}
                         <button 
-                          className="p-2 bg-sky-600 text-white rounded-xl hover:bg-sky-700 transition-all hover:scale-110 shadow-lg shadow-sky-200"
-                          title="Start Video Consultation"
+                          className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all hover:scale-110 shadow-lg shadow-emerald-200"
+                          title="Open Patient Chat"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/chat/${app.appointmentId}`);
+                          }}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
-                            <path d="M240,128a15.89,15.89,0,0,1-8.15,13.93l-48,26.47A16,16,0,0,1,160,174.45V184a16,16,0,0,1-16,16H32a16,16,0,0,1-16-16V72A16,16,0,0,1,32,56H144a16,16,0,0,1,16,16V81.55a16,16,0,0,1,23.85-13.95l48,26.47A15.89,15.89,0,0,1,240,128Z"></path>
+                            <path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A15.48,15.48,0,0,0,40,240a15.87,15.87,0,0,0,10.16-3.71L84.8,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48Zm0,144H80a8,8,0,0,0-5.16,1.89L40,221.71V64H216V192ZM160,112a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,112Zm0,32a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,144Z"></path>
                           </svg>
                         </button>
-                      )}
+                      </div>
                    </div>
                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-semibold items-center">
                       <span className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full">

@@ -9,6 +9,8 @@ import doctorReducer from "./doctor/doctorSlice";
 import appointmentReducer from "./appointments/appointmentSlice"
 import patientReducer from "./patient/patientSlice";
 import notificationReducer from "./notification/notificationSlice";
+import chatReducer from "./chat/chatSlice";
+import callReducer from "./call/callSlice";
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +23,8 @@ export const store = configureStore({
     appointments: appointmentReducer,
     patient: patientReducer,
     notifications: notificationReducer,
+    chat: chatReducer,
+    call: callReducer,
   },
 });
 

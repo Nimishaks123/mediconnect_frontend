@@ -1,9 +1,10 @@
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { loadUserFromToken, selectCurrentUser } from "./store/auth/authSlice";
+import { loadUserFromToken, selectCurrentUser, setInitialized } from "./store/auth/authSlice";
 import AppRoutes from "./routes";
 import { socketService } from "./services/socketService";
+import IncomingCallModal from "./components/chat/IncomingCallModal";
 
 export default function App() {
   const dispatch = useAppDispatch();
@@ -11,7 +12,11 @@ export default function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (token) dispatch(loadUserFromToken(token));
+    if (token) {
+      dispatch(loadUserFromToken(token));
+    } else {
+      dispatch(setInitialized());
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -25,6 +30,7 @@ export default function App() {
   return (
     <>
       <Toaster position="top-right" />
+      <IncomingCallModal />
       <AppRoutes />
     </>
   );

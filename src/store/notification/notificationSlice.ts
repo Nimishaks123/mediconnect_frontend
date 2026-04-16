@@ -35,7 +35,7 @@ export const fetchNotifications = createAsyncThunk(
   async (page: number = 1, { rejectWithValue }) => {
     try {
       const response = await api.get(`/notifications?page=${page}`);
-      return response.data.data;
+      return response.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch notifications");
     }

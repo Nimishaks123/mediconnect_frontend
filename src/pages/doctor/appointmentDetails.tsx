@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 
 type AppointmentForDoctor = {
   appointmentId: string;
+  patientId: string;
   patientName: string;
   date: string;
   startTime: string;
@@ -209,6 +210,16 @@ export default function DoctorAppointmentDetailsPage() {
              <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Payment Status</label>
              <p className="text-lg font-bold text-gray-900">{appointment.paymentStatus}</p>
           </div>
+        </div>
+
+        <div className="mb-8 text-center">
+           <button 
+             onClick={() => navigate(`/chat/${appointment.appointmentId}`)}
+             className="w-full py-5 bg-sky-50 text-sky-600 font-black uppercase text-xs tracking-widest rounded-[2rem] border-4 border-dashed border-sky-100 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:shadow-2xl hover:shadow-sky-100 transition-all flex items-center justify-center gap-4 active:scale-95 group"
+           >
+             <span className="text-2xl group-hover:rotate-12 transition-transform inline-block">💬</span>
+             Open Patient Communication Channel
+           </button>
         </div>
 
         {appointment.status !== 'CANCELLED' && appointment.status !== 'COMPLETED' && (

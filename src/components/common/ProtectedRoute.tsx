@@ -1,68 +1,63 @@
 // src/components/common/ProtectedRoute.tsx
-import { useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
-import { selectCurrentUser } from "../../store/auth/authSlice";
+import { selectAuth } from "../../store/auth/authSlice";
 import { ROUTES } from "../../constants/routes";
-import type { AuthUser, Role } from "../../store/auth/authSlice";
+import type { Role } from "../../store/auth/authSlice";
 
 type ProtectedRouteProps = {
   allowedRoles?: Role[];
 };
 
 export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
-  const reduxUser = useAppSelector(selectCurrentUser);
+  const { user, accessToken, status, isInitialized } = useAppSelector(selectAuth);
   const location = useLocation();
-  const accessToken = localStorage.getItem("accessToken");
 
-  const [hydratedUser, setHydratedUser] = useState<AuthUser | null | undefined>(
-    undefined
-  );
-
-  // 🟦 Hydrate from Redux or localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem("currentUser");
-
-    if (reduxUser) {
-      setHydratedUser(reduxUser);
-    } else if (storedUser) {
-      try {
-        setHydratedUser(JSON.parse(storedUser));
-      } catch {
-        setHydratedUser(null);
-      }
-    } else {
-      setHydratedUser(null);
-    }
-  }, [reduxUser]);
-
-  // 🟧 Still hydrating? Wait.
-  if (hydratedUser === undefined) {
-    return <div />; // prevents redirect loops
+  // 1. Wait for initialization (initial token check)
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
   }
 
-  // 🔴 No token OR no user → force login
-  if (!accessToken || !hydratedUser) {
-    return <Navigate to={ROUTES.LOGIN} replace />;
+  // 2. If we have no token, definitely not logged in
+  if (!accessToken) {
+    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
+  // 3. If we have a token but no user, and we're not loading something else
+  if (!user && status !== "loading") {
+    return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
+  }
 
-  // 🔒 Doctor onboarding check (MUST be approved to access non-onboarding doctor routes)
-  if (hydratedUser.role === "DOCTOR") {
+  // 4. Loading state with no user yet
+  if (status === "loading" && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  // 🔒 Doctor onboarding check
+  if (user.role === "DOCTOR") {
     const path = location.pathname;
     const isAccessingOnboarding = path.startsWith("/doctor/onboarding");
     const isAccessingStatusPages = path === ROUTES.DOCTOR_PENDING || path === ROUTES.DOCTOR_REJECTED || path === ROUTES.DOCTOR_PROFILE;
 
-    if (hydratedUser.onboardingStatus === "APPROVED") {
-      // Approved doctors shouldn't be stuck on onboarding or pending pages
+    if (user.onboardingStatus === "APPROVED") {
       if (isAccessingOnboarding || path === ROUTES.DOCTOR_PENDING) {
         return <Navigate to={ROUTES.DOCTOR_DASHBOARD} replace />;
       }
-    } else if (hydratedUser.onboardingStatus === "REJECTED") {
+    } else if (user.onboardingStatus === "REJECTED") {
       if (path !== ROUTES.DOCTOR_REJECTED && path !== ROUTES.DOCTOR_PROFILE) {
         return <Navigate to={ROUTES.DOCTOR_REJECTED} replace />;
       }
-    } else if (hydratedUser.onboardingStatus === "SUBMITTED") {
+    } else if (user.onboardingStatus === "SUBMITTED") {
       if (path !== ROUTES.DOCTOR_PENDING && path !== ROUTES.DOCTOR_PROFILE) {
         return <Navigate to={ROUTES.DOCTOR_PENDING} replace />;
       }
@@ -75,17 +70,16 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   // 🔒 Role-based protection
-  if (allowedRoles && !allowedRoles.includes(hydratedUser.role)) {
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     const fallback =
-      hydratedUser.role === "ADMIN"
+      user.role === "ADMIN"
         ? ROUTES.ADMIN_DASHBOARD
-        : hydratedUser.role === "DOCTOR"
-        ? ROUTES.DOCTOR_ONBOARDING
+        : user.role === "DOCTOR"
+        ? (user.onboardingStatus === "APPROVED" ? ROUTES.DOCTOR_DASHBOARD : ROUTES.DOCTOR_ONBOARDING)
         : ROUTES.USER_DASHBOARD;
 
     return <Navigate to={fallback} replace />;
   }
 
-  // 🟢 All good — allow page
   return <Outlet />;
 }

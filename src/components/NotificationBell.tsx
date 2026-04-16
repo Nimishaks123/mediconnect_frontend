@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchNotifications, markAsRead } from "../store/notification/notificationSlice";
-import { BellIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, ChatBubbleLeftIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { BellIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, ChatBubbleLeftIcon, ExclamationCircleIcon, XCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 const getTimeAgo = (date: Date) => {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
   let interval = seconds / 31536000;
@@ -44,6 +44,8 @@ export default function NotificationBell() {
   const getIcon = (type: string) => {
     switch (type) {
       case "APPOINTMENT": return <ClockIcon className="w-5 h-5 text-blue-500" />;
+      case "APPOINTMENT_CANCELLED": return <XCircleIcon className="w-5 h-5 text-red-500" />;
+      case "APPOINTMENT_RESCHEDULED": return <ArrowPathIcon className="w-5 h-5 text-amber-500" />;
       case "PAYMENT": return <CreditCardIcon className="w-5 h-5 text-emerald-500" />;
       case "CHAT": return <ChatBubbleLeftIcon className="w-5 h-5 text-purple-500" />;
       default: return <ExclamationCircleIcon className="w-5 h-5 text-gray-500" />;
@@ -83,14 +85,14 @@ export default function NotificationBell() {
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-12 text-center text-gray-400">
-                 <BellIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                 <p className="text-xs font-black uppercase tracking-[0.2em]">All Caught Up!</p>
+                <BellIcon className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <p className="text-xs font-black uppercase tracking-[0.2em]">All Caught Up!</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
                 {notifications.map((n) => (
-                  <div 
-                    key={n.id} 
+                  <div
+                    key={n.id}
                     onClick={() => handleMarkAsRead(n.id)}
                     className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors relative group ${!n.isRead ? "bg-blue-50/30" : ""}`}
                   >
@@ -121,11 +123,11 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <button 
+          <button
             className="w-full p-4 text-[10px] font-black text-gray-400 hover:text-blue-600 hover:bg-gray-50 transition-all uppercase tracking-[0.2em] border-t border-gray-50"
             onClick={() => setIsOpen(false)}
           >
-            Close Panel
+            Close
           </button>
         </div>
       )}

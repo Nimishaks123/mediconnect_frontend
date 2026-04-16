@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
 import { ROUTES } from "../constants/routes";
 import { useAppDispatch } from "../store/hooks";
-import { loginSuccess } from "../store/auth/authSlice";
+import { setCredentials } from "../store/auth/authSlice";
 
 interface DecodedToken {
   id: string;
@@ -48,15 +48,8 @@ export default function OAuthSuccess() {
           onboardingStatus: decoded.onboardingStatus,
         };
 
-        // Store in localStorage
-        localStorage.setItem("accessToken", token);
-        localStorage.setItem("currentUser", JSON.stringify(user));
-
-        // Delay slightly so ProtectedRoute hydrates correctly
-        await new Promise((res) => setTimeout(res, 150));
-
         if (mounted) {
-          dispatch(loginSuccess({ user, accessToken: token }));
+          dispatch(setCredentials({ user, accessToken: token }));
         }
 
         toast.success("Login successful!");

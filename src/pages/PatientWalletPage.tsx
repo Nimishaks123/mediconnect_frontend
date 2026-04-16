@@ -17,13 +17,16 @@ type WalletData = {
 export default function PatientWalletPage() {
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getMyWallet()
       .then((data) => {
         setWallet(data);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Wallet load error:", err);
+        setError("Unable to load wallet data. Please try again later.");
         toast.error("Failed to load wallet data");
       })
       .finally(() => setLoading(false));
@@ -31,8 +34,27 @@ export default function PatientWalletPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
+        <p className="text-xs font-black text-gray-400 uppercase tracking-widest animate-pulse">Synchronizing Wallet...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-50 p-6 text-center">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+          <span className="text-3xl">⚠️</span>
+        </div>
+        <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">{error}</h2>
+        <p className="text-gray-500 mb-8 max-w-xs mx-auto text-sm font-medium">We encountered an internal server error while retrieving your financial data.</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="bg-sky-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-200"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

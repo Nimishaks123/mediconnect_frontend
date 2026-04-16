@@ -168,6 +168,17 @@ export default function PatientAppointmentsPage() {
                     >
                       {appt.status}
                     </span>
+                    {(appt.status === "CONFIRMED" || appt.status === "RESCHEDULED") && (
+                       <button
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           navigate(`/chat/${appt.id}`);
+                         }}
+                         className="w-full mt-2 px-4 py-2 bg-sky-50 text-sky-600 font-bold text-xs rounded-xl hover:bg-sky-600 hover:text-white transition-all flex items-center justify-center gap-2 border border-sky-100 shadow-sm"
+                       >
+                         💬 Chat
+                       </button>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-end">
