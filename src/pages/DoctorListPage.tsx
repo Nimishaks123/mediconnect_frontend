@@ -4,6 +4,7 @@ import { fetchVerifiedDoctors } from "../store/appointments/appointmentThunks";
 import DoctorCard from "../components/doctor/dashboard/DoctorCard";
 import { useNavigate } from "react-router-dom";
 
+
 export default function DoctorListPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

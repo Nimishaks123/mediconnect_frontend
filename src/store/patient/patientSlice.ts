@@ -12,7 +12,7 @@ export interface PatientProfile {
   address: string | null;
   profileImage: string | null;
   dateOfBirth: string | null;
-  medicalHistory: Record<string, any>;
+  medicalHistory: Record<string, unknown>;
   allergies: string[];
   bloodGroup: string | null;
   emergencyContactName: string | null;
@@ -36,18 +36,30 @@ export const getPatientProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await patientApi.getProfile();
+
+      // Handle 304 or empty response
+      if (response.status === 304 || !response.data) {
+        return null;
+      }
+
       // Backend returns { user, patient }
       return response.data.patient;
-    } catch (error) {
-      const axiosErr = error as AxiosError<{ message: string }>;
-      return rejectWithValue(axiosErr.response?.data?.message || "Failed to fetch profile");
+    } catch (error: any) {
+      // 404 means the user is a patient but hasn't created a profile yet
+      if (error.response?.status === 404) {
+        return null;
+      }
+
+      const message = error.response?.data?.message || "Failed to fetch profile";
+      return rejectWithValue(message);
     }
   }
 );
 
+
 export const createPatientProfile = createAsyncThunk(
   "patient/createProfile",
-  async (data: any, { rejectWithValue }) => {
+  async (data: unknown, { rejectWithValue }) => {
     try {
       const response = await patientApi.createProfile(data);
       return response.data.patient;
@@ -60,7 +72,7 @@ export const createPatientProfile = createAsyncThunk(
 
 export const updatePatientProfile = createAsyncThunk(
   "patient/updateProfile",
-  async (data: any, { rejectWithValue }) => {
+  async (data: unknown, { rejectWithValue }) => {
     try {
       const response = await patientApi.updateProfile(data);
       return response.data.patient;

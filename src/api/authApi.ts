@@ -25,4 +25,11 @@ export const authApi = {
     api.post<LoginResponse>("/auth/login", { email, password }),
 
   signup: (data: SignupPayload) => api.post("/auth/signup", data),
+
+  getMe: () => 
+    api.get<{ success: boolean; user: LoginResponse['user'] }>("/auth/me"),
+
+  logout: () => 
+    api.post("/auth/logout"),
 };
+

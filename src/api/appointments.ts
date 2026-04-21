@@ -8,11 +8,13 @@ export type CreateAppointmentPayload = {
 };
 
 export const createAppointment = async (
-  payload: { doctorId: string; availabilityId: string }
+  payload: { doctorId: string; slotId: string; date?: string }
 ) => {
+  console.log("Sending appointment payload:", payload);
   const res = await api.post("/appointments", payload);
   return res.data;
 };
+
 
 export const getDoctorAppointments = async () => {
   const res = await api.get("/doctor/appointments");

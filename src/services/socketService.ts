@@ -32,9 +32,9 @@ class SocketService {
     });
 
     this.socket.on("messages_seen", (data) => {
-      store.dispatch(updateMessageStatus({ 
-        conversationId: data.conversationId, 
-        status: "seen" 
+      store.dispatch(updateMessageStatus({
+        conversationId: data.conversationId,
+        status: "seen"
       }));
     });
 
@@ -47,7 +47,6 @@ class SocketService {
     });
 
     this.socket.on("notification", (notification) => {
-      console.log("[Socket] New notification received:", notification);
       store.dispatch(addNotification(notification));
       showSuccess(notification.title);
     });
@@ -87,7 +86,6 @@ class SocketService {
   }
 
   emitJoinCallRoom(appointmentId: string) {
-    console.log("[Socket] Joining call room:", appointmentId);
     this.socket?.emit("join_call_room", { appointmentId });
   }
 

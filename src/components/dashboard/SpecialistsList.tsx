@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { Doctor } from "../../types/Doctor";
+import defaultDoctor from "../../assets/default-doctor.jpeg"
 
 type Props = {
   doctors: Doctor[];
@@ -27,7 +28,7 @@ export default function SpecialistsList({ doctors, loading }: Props) {
         // 🛡️ Data Integrity: Ensure we have a valid identifier
         const docWithIds = doc as Doctor & { doctorId?: string };
         const dId = docWithIds.doctorId || docWithIds.id;
-        
+
         if (!dId) return null;
 
         return (
@@ -36,7 +37,7 @@ export default function SpecialistsList({ doctors, loading }: Props) {
             className="bg-white p-4 rounded-lg shadow flex gap-4 transition-all hover:shadow-md"
           >
             <img
-              src={doc.photo}
+              src={defaultDoctor}
               alt={doc.name}
               className="w-16 h-16 rounded-full object-cover bg-gray-100"
               onError={(e) => {

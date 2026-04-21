@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { selectCurrentUser } from "../store/auth/authSlice";
+import { fetchDoctorProfile } from "../store/doctor/doctorSlice";
 import { doctorOnboardingApi } from "../api/doctorOnboardingApi";
 import { uploadApi } from "../api/uploadApi";
-import { showSuccess, showError, showLoading, dismissToast } from "../utils/toastUtils";
+import { showSuccess, showError, showLoading } from "../utils/toastUtils";
 import { 
   UserIcon, 
   AcademicCapIcon, 
@@ -22,9 +23,10 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function DoctorProfilePage() {
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { profile, loading, error } = useAppSelector((state) => state.doctor);
+  
   const [isEditing, setIsEditing] = useState(false);
   const [showCerts, setShowCerts] = useState(false);
   
@@ -37,33 +39,26 @@ export default function DoctorProfilePage() {
     aboutMe: "",
     profilePhoto: ""
   });
+  
   const [updating, setUpdating] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const profilePhotoRef = useRef<HTMLInputElement>(null);
 
-  const fetchProfile = async () => {
-    try {
-      const res = await doctorOnboardingApi.getProfile();
-      const doc = res.data.doctor;
-      setProfile(doc);
-      setEditForm({
-        specialty: doc.specialty || "",
-        qualification: doc.qualification || "",
-        experience: doc.experience || 0,
-        consultationFee: doc.consultationFee || 100,
-        aboutMe: doc.aboutMe || "",
-        profilePhoto: doc.profilePhoto || ""
-      });
-    } catch (err) {
-      showError("Failed to load doctor profile");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Sync local edit form with global profile once it loads
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (profile) {
+      setEditForm({
+        specialty: profile.specialty || "",
+        qualification: profile.qualification || "",
+        experience: profile.experience || 0,
+        consultationFee: profile.consultationFee || 100,
+        aboutMe: profile.aboutMe || "",
+        profilePhoto: profile.profilePhoto || ""
+      });
+    } else {
+      dispatch(fetchDoctorProfile());
+    }
+  }, [profile, dispatch]);
 
   // 📌 PART 7 & 8: INSTANT PHOTO UPDATE
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,8 +91,8 @@ export default function DoctorProfilePage() {
         profilePhoto: imageUrl
       });
 
-      // 5️⃣ UPDATE PREVIEW INSTANTLY
-      setProfile((prev: any) => ({ ...prev, profilePhoto: imageUrl }));
+      // 5️⃣ UPDATE REDUX STORE
+      dispatch(fetchDoctorProfile());
       setEditForm((prev: any) => ({ ...prev, profilePhoto: imageUrl }));
       
       showSuccess("Profile photo updated!", loadingToast);
@@ -130,7 +125,8 @@ export default function DoctorProfilePage() {
       await doctorOnboardingApi.updateBasicInfo(editForm);
       showSuccess("Profile updated successfully");
       setIsEditing(false);
-      fetchProfile();
+      dispatch(fetchDoctorProfile());
+
     } catch (err: any) {
       showError(err.response?.data?.message || "Failed to update profile");
     } finally {

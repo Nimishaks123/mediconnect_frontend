@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import doctorPlaceholder from "../assets/default-doctor.jpeg";
 
 interface Appointment {
+  _id: string;
   id: string;
   date: string;
   startTime: string;
@@ -37,7 +38,7 @@ export default function PatientAppointmentDetailsPage() {
     if (!appointment && id) {
       getMyAppointments()
         .then((data: Appointment[]) => {
-          const found = data.find((a) => a.id === id);
+          const found = data.find((a) => a._id === id || a.id === id);
           if (found) setAppointment(found);
           else {
             toast.error("Appointment not found");
@@ -266,7 +267,7 @@ export default function PatientAppointmentDetailsPage() {
 
             {appointment.doctor?.userId && (
               <button 
-                onClick={() => navigate(`/chat/${appointment.id}`)}
+                onClick={() => navigate(`/chat/${appointment._id || appointment.id}`)}
                 className="w-full py-4 bg-sky-50 text-sky-600 font-black uppercase text-xs tracking-widest rounded-2xl border-2 border-dashed border-sky-200 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:shadow-xl hover:shadow-sky-100 transition-all flex items-center justify-center gap-3 active:scale-95 group"
               >
                 <span className="text-xl group-hover:animate-bounce">💬</span>

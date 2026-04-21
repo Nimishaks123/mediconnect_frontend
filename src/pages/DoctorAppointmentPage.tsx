@@ -98,18 +98,23 @@ export default function DoctorAppointmentPage() {
   try {
     setLoading(true);
 
-    // Create availabilityId exactly how backend expects
-    const availabilityId = `${doctorId}_${selectedDate}_${selectedSlot.startTime}_${selectedSlot.endTime}`;
+    // Create slotId (concatenated format for backend parsing)
+    const slotId = `${doctorId}_${selectedDate}_${selectedSlot.startTime}_${selectedSlot.endTime}`;
+    console.log("Sending slotId:", slotId);
 
     const appointmentRes = await createAppointment({
+
       doctorId,
-      availabilityId,
+      slotId,
+      date: selectedDate,
     });
 
-    const appointmentId = appointmentRes.appointmentId;
+    const appointmentId = appointmentRes._id || appointmentRes.appointmentId;
+    console.log("Checkout appointmentId:", appointmentId);
 
     // Create Stripe Checkout session
     const paymentRes = await createCheckoutSession(appointmentId);
+
 
     // Redirect to Stripe
     window.location.href = paymentRes.checkoutUrl;

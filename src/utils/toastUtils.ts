@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
  */
 
 // Track active toasts to prevent duplicates if needed
-const activeToasts = new Set<string>();
+// const activeToasts = new Set<string>();
 
 export const showSuccess = (message: string, id?: string) => {
   toast.success(message, { id });

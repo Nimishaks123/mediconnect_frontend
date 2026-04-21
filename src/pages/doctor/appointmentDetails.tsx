@@ -26,11 +26,11 @@ export default function DoctorAppointmentDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [appointment, setAppointment] = useState<AppointmentForDoctor | null>(
     location.state?.app || null
   );
-  
+
   const [loading, setLoading] = useState(!appointment);
   const [rescheduling, setRescheduling] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -71,7 +71,7 @@ export default function DoctorAppointmentDetailsPage() {
     try {
       const slotsResponse = await api.get(`/doctor/schedules/slots?from=${date}&to=${date}`);
       const rawData = Array.isArray(slotsResponse.data) ? slotsResponse.data : slotsResponse.data.data || [];
-      
+
       const freeSlots = rawData.filter((s: any) => !s.isBooked).map((s: any) => ({
         _id: s._id || `${s.date}_${s.startTime}`,
         startTime: s.startTime,
@@ -165,7 +165,7 @@ export default function DoctorAppointmentDetailsPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8">
-      <button 
+      <button
         onClick={() => navigate("/doctor/appointments")}
         className="mb-8 font-bold text-sky-600 hover:text-sky-800 transition-colors"
       >
@@ -180,62 +180,61 @@ export default function DoctorAppointmentDetailsPage() {
           <div className="flex-1 space-y-2">
             <h1 className="text-4xl font-extrabold text-gray-900">{appointment.patientName}</h1>
             <div className="flex gap-4 items-center">
-               <span className={`text-xs uppercase font-black tracking-widest px-3 py-1.5 rounded-lg ${
-                 appointment.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 
-                 appointment.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-               }`}>
-                 {appointment.status}
-               </span>
-               <span className="text-gray-400 font-bold text-sm">
-                 ID: #{appointment.appointmentId.slice(-8).toUpperCase()}
-               </span>
+              <span className={`text-xs uppercase font-black tracking-widest px-3 py-1.5 rounded-lg ${appointment.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' :
+                  appointment.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                }`}>
+                {appointment.status}
+              </span>
+              <span className="text-gray-400 font-bold text-sm">
+                ID: #{appointment.appointmentId.slice(-8).toUpperCase()}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-2xl mb-8 border border-gray-100">
           <div>
-             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Date</label>
-             <p className="text-lg font-bold text-gray-900">
-               {new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-             </p>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Date</label>
+            <p className="text-lg font-bold text-gray-900">
+              {new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
           </div>
           <div>
-             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Time</label>
-             <p className="text-lg font-bold text-gray-900">
-               {appointment.startTime} - {appointment.endTime}
-             </p>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Time</label>
+            <p className="text-lg font-bold text-gray-900">
+              {appointment.startTime} - {appointment.endTime}
+            </p>
           </div>
           <div>
-             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Payment Status</label>
-             <p className="text-lg font-bold text-gray-900">{appointment.paymentStatus}</p>
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Payment Status</label>
+            <p className="text-lg font-bold text-gray-900">{appointment.paymentStatus}</p>
           </div>
         </div>
 
         <div className="mb-8 text-center">
-           <button 
-             onClick={() => navigate(`/chat/${appointment.appointmentId}`)}
-             className="w-full py-5 bg-sky-50 text-sky-600 font-black uppercase text-xs tracking-widest rounded-[2rem] border-4 border-dashed border-sky-100 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:shadow-2xl hover:shadow-sky-100 transition-all flex items-center justify-center gap-4 active:scale-95 group"
-           >
-             <span className="text-2xl group-hover:rotate-12 transition-transform inline-block">💬</span>
-             Open Patient Communication Channel
-           </button>
+          <button
+            onClick={() => navigate(`/chat/${appointment.appointmentId}`)}
+            className="w-full py-5 bg-sky-50 text-sky-600 font-black uppercase text-xs tracking-widest rounded-[2rem] border-4 border-dashed border-sky-100 hover:bg-sky-600 hover:text-white hover:border-sky-600 hover:shadow-2xl hover:shadow-sky-100 transition-all flex items-center justify-center gap-4 active:scale-95 group"
+          >
+            <span className="text-2xl group-hover:rotate-12 transition-transform inline-block">💬</span>
+            Open Patient Communication Channel
+          </button>
         </div>
 
         {appointment.status !== 'CANCELLED' && appointment.status !== 'COMPLETED' && (
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-             <button
-               onClick={handleCancel}
-               className="flex-1 px-6 py-4 border-2 border-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all active:scale-95 text-lg"
-             >
-               Cancel Appointment
-             </button>
-             <button
-               onClick={handleRescheduleClick}
-               className="flex-1 px-6 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95 text-lg"
-             >
-               Reschedule
-             </button>
+            <button
+              onClick={handleCancel}
+              className="flex-1 px-6 py-4 border-2 border-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all active:scale-95 text-lg"
+            >
+              Cancel Appointment
+            </button>
+            <button
+              onClick={handleRescheduleClick}
+              className="flex-1 px-6 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95 text-lg"
+            >
+              Reschedule
+            </button>
           </div>
         )}
 
@@ -248,8 +247,8 @@ export default function DoctorAppointmentDetailsPage() {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="md:w-72">
                 <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2 pl-1">Target Date</label>
-                <input 
-                  type="date" 
+                <input
+                  type="date"
                   value={selectedDate}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => handleDateChange(e.target.value)}
@@ -267,7 +266,7 @@ export default function DoctorAppointmentDetailsPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {availableSlots.length === 0 ? (
                       <div className="col-span-full py-12 bg-white rounded-3xl border-2 border-dashed border-gray-100 text-center">
-                         <p className="text-sm font-bold text-gray-400 italic">No free slots found</p>
+                        <p className="text-sm font-bold text-gray-400 italic">No free slots found</p>
                       </div>
                     ) : (
                       availableSlots.map((slot, idx) => (

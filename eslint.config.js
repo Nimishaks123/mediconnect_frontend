@@ -54,6 +54,7 @@ export default defineConfig([
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
 
       // ==== React Hooks ====
       'react-hooks/rules-of-hooks': 'error',

@@ -1,4 +1,4 @@
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 import {
   createSlice,
@@ -94,11 +94,11 @@ export const loginAdmin = createAsyncThunk<
     localStorage.setItem("currentUser", JSON.stringify(admin));
 
     return { admin, accessToken };
-   } catch (error: unknown) {
-  const axiosErr = error as AxiosError<{ message: string }>;
-  const msg = axiosErr.response?.data?.message || "Admin login failed";
-  return rejectWithValue(msg);
-}
+  } catch (error: unknown) {
+    const axiosErr = error as AxiosError<{ message: string }>;
+    const msg = axiosErr.response?.data?.message || "Admin login failed";
+    return rejectWithValue(msg);
+  }
 });
 
 const authSlice = createSlice({
@@ -153,7 +153,9 @@ const authSlice = createSlice({
             if (storedUser.id === decoded.id && storedUser.onboardingStatus) {
               onboardingStatus = storedUser.onboardingStatus;
             }
-          } catch (e) {}
+          } catch (e) {
+            console.log(e);
+          }
         }
 
         state.user = {
@@ -220,14 +222,14 @@ const authSlice = createSlice({
   },
 });
 
-export const { 
-  updateAccessToken, 
-  logout, 
-  setCredentials, 
-  loadUserFromToken, 
-  setOnboardingStatus, 
+export const {
+  updateAccessToken,
+  logout,
+  setCredentials,
+  loadUserFromToken,
+  setOnboardingStatus,
   clearError,
-  setInitialized 
+  setInitialized
 } = authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.auth;
