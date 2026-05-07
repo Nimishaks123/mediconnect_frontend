@@ -2,7 +2,7 @@ import axios from "axios";
 import { AxiosHeaders } from "axios";
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { showError } from "../utils/toastUtils";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ?? "http://localhost:4000/api";
 
@@ -11,15 +11,13 @@ export const api = axios.create({
   withCredentials: true,
 });
 
-/* ================= REQUEST ================= */
+//req
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
-
-  // Don't add token for auth routes where it's not needed or could cause issues
   const skipAuth = 
-    config.url?.includes("/auth/login") || 
-    config.url?.includes("/auth/refresh") ||
-    config.url?.includes("/auth/verify-otp");
+    config.url?.includes(API_ENDPOINTS.AUTH.LOGIN) ||
+  config.url?.includes(API_ENDPOINTS.AUTH.REFRESH) ||
+  config.url?.includes(API_ENDPOINTS.AUTH.VERIFY_OTP);
 
   if (!skipAuth && token) {
     config.headers = config.headers ?? new AxiosHeaders();
@@ -29,7 +27,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/* ================= RESPONSE ================= */
+//res
 type RetryRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
@@ -57,8 +55,8 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes("/auth/login") &&
-      !originalRequest.url?.includes("/auth/refresh")
+     !originalRequest.url?.includes(API_ENDPOINTS.AUTH.LOGIN) &&
+!originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH)
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -98,7 +96,7 @@ api.interceptors.response.use(
         localStorage.removeItem("accessToken");
         localStorage.removeItem("currentUser");
         
-        // Optional: you could trigger a page reload or a redirect here if not handled by ProtectedRoute
+        // Optional
         if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
            window.location.href = "/login";
         }
@@ -109,11 +107,11 @@ api.interceptors.response.use(
       }
     }
 
-    // Global error handler for other errors
+    // Global error handler 
     if (error.response?.status !== 102 && error.response?.status !== 401) {
        const message = (error.response?.data as any)?.message || (error.response?.data as any)?.error || "Something went wrong";
-       // Only show toast if it's not a background check or specific omitted error
-       if (!originalRequest.url?.includes("/notifications/unread-count")) {
+       // Only show toast 
+       if (!originalRequest.url?.includes(API_ENDPOINTS.NOTIFICATIONS.UNREAD_COUNT)) {
           showError(message);
        }
     }

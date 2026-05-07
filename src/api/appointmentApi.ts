@@ -1,7 +1,5 @@
 import { api } from "./api";
 
-/* ================= DOCTORS ================= */
-
 // Get verified doctors
 export const getVerifiedDoctors = () =>
   api.get("/doctors/verified");
@@ -17,7 +15,6 @@ export const getDoctorAvailability = (
       to: date,
     },
   });
-/* ================= APPOINTMENTS ================= */
 
 // Book appointment (PATIENT)
 export const bookAppointment = (data: {

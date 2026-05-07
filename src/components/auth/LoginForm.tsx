@@ -219,7 +219,7 @@ export default function LoginForm() {
               Continue as Patient
             </button>
 
-            {/* DOCTOR GOOGLE BUTTON */}
+            {/* DOCTOR GOOGLE BUTTON
             <button
               type="button"
               onClick={handleDoctorGoogleLogin}
@@ -249,7 +249,7 @@ export default function LoginForm() {
                 />
               </svg>
               Continue as Doctor
-            </button>
+            </button> */}
           </form>
 
           <p className="text-center text-gray-600 mt-6 text-sm">
