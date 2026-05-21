@@ -39,19 +39,10 @@ interface JwtPayload {
   exp?: number;
 }
 
-const getInitialUser = (): AuthUser | null => {
-  const storedUser = localStorage.getItem("currentUser");
-  if (!storedUser) return null;
-  try {
-    return JSON.parse(storedUser);
-  } catch {
-    return null;
-  }
-};
 
 const initialState: AuthState = {
-  user: getInitialUser(),
-  accessToken: localStorage.getItem("accessToken"),
+  user:null,
+  accessToken:null,
   status: "idle",
   error: null,
   isInitialized: false,

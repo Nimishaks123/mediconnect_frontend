@@ -63,7 +63,7 @@ export default function LoginForm() {
     showSuccess("Welcome back, " + user.name + "!");
 
     if (user.role === "PATIENT") {
-      navigate(ROUTES.HOME);
+      navigate(ROUTES.USER_DASHBOARD);
     } else if (user.role === "DOCTOR") {
       if (user.onboardingStatus === "APPROVED") {
         navigate(ROUTES.DOCTOR_DASHBOARD);

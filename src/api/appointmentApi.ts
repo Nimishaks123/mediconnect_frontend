@@ -1,15 +1,17 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 // Get verified doctors
 export const getVerifiedDoctors = () =>
-  api.get("/doctors/verified");
+  api.get(API_ENDPOINTS.DOCTORS.VERIFIED);
 
 
 export const getDoctorAvailability = (
   doctorId: string,
   date: string
 ) =>
-  api.get(`/patient/doctors/slots/${doctorId}`, {
+  api.get(API_ENDPOINTS.PATIENT_DOCTORS.GET_AVAILABILITY(
+      doctorId
+    ), {
     params: {
       from: date,
       to: date,
@@ -17,12 +19,25 @@ export const getDoctorAvailability = (
   });
 
 // Book appointment (PATIENT)
-export const bookAppointment = (data: {
-  doctorId: string;
-  availabilityId: string;
-}) =>
-  api.post("/appointments", data);
+// export const bookAppointment = (data: {
+//   doctorId: string;
+//   availabilityId: string;
+// }) =>
+//   api.post( API_ENDPOINTS.APPOINTMENTS.CREATE,data);
+export const bookAppointment = (
+  data: {
+    doctorId: string;
+    slotId: string;
+    date?: string;
+  }
+) =>
+  api.post(
+    API_ENDPOINTS.APPOINTMENTS.CREATE,
+    data
+  );
 
 // Cancel appointment
 export const cancelAppointment = (appointmentId: string) =>
-  api.patch(`/appointments/${appointmentId}/cancel`);
+  api.patch(API_ENDPOINTS.APPOINTMENTS.CANCEL(
+      appointmentId
+    ));

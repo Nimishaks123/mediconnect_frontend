@@ -1,7 +1,7 @@
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { loadUserFromToken, selectCurrentUser, setInitialized } from "./store/auth/authSlice";
+import { loadUserFromToken, selectCurrentUser, setInitialized,logout } from "./store/auth/authSlice";
 import AppRoutes from "./routes";
 import { socketService } from "./services/socketService";
 import IncomingCallModal from "./components/chat/IncomingCallModal";
@@ -9,6 +9,24 @@ import IncomingCallModal from "./components/chat/IncomingCallModal";
 export default function App() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
+  useEffect(() => {
+  const handlePageShow = () => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) {
+      dispatch(loadUserFromToken(token));
+    } else {
+      dispatch(logout());
+      dispatch(setInitialized());
+    }
+  };
+
+  window.addEventListener("pageshow", handlePageShow);
+
+  return () => {
+    window.removeEventListener("pageshow", handlePageShow);
+  };
+}, [dispatch]);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");

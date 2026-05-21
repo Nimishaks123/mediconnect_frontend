@@ -1,5 +1,5 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export interface PendingDoctor {
   doctor: {
     id: string;
@@ -46,11 +46,11 @@ export const adminDoctorApi = {
         totalPages: number;
         total: number;
       }
-    }>("/admin/doctors", { params }),
+    }>( API_ENDPOINTS.ADMIN_DOCTORS.GET_ALL, { params }),
 
   approveDoctor: (userId: string) =>
-    api.post("/admin/approve-doctor", { userId }),
+    api.post(API_ENDPOINTS.ADMIN_DOCTORS.APPROVE, { userId }),
 
   rejectDoctor: (userId: string, reason: string) =>
-    api.post("/admin/reject-doctor", { userId, reason }),
+    api.post(API_ENDPOINTS.ADMIN_DOCTORS.REJECT, { userId, reason }),
 };

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import SignupImage from "../../assets/image 16.png";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { selectCurrentUser, logout } from "../../store/auth/authSlice";
-
+//import { selectCurrentUser, logout } from "../../store/auth/authSlice";
+import {selectAuth,logout} from "../../store/auth/authSlice";
 import { ROUTES } from "../../constants/routes";
 import NotificationBell from "../NotificationBell";
 
@@ -12,14 +12,15 @@ const Header: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(selectCurrentUser);
-  const isAuthenticated = Boolean(user);
+  //const user = useAppSelector(selectCurrentUser);
+  const {user,accessToken}=useAppSelector(selectAuth);
+  //const accessToken=localStorage.getItem("accessToken");
+  const isAuthenticated = Boolean(user && accessToken);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // -----------------------------
-  // DYNAMIC HOME ROUTE
-  // -----------------------------
+// DYNAMIC HOME ROUTE
+
   let homeRoute: string = ROUTES.HOME;
 
   if (user?.role === "PATIENT") {
@@ -37,9 +38,7 @@ const Header: React.FC = () => {
     { label: "About Us", to: "/about" },
   ];
 
-  // -----------------------------
   // ROUTE DETECTION
-  // -----------------------------
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAuthPage = ["/login", "/signup"].includes(location.pathname);
 
@@ -49,7 +48,8 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/login");
+    navigate("/login",{replace:true});
+   // window.location.reload();
   };
 
   return (
@@ -72,7 +72,7 @@ const Header: React.FC = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              end={link.to === "/"} // Fix for active link highlighting on root
+              end={link.to === "/"} // Fix for active link 
               className={({ isActive }) =>
                 isActive
                   ? "text-mediconnect-green font-semibold"
@@ -86,9 +86,6 @@ const Header: React.FC = () => {
 
         {/* RIGHT SIDE ACTIONS */}
         <div className="flex items-center gap-4">
-          {/* =========================
-              LOGIN / SIGNUP (PUBLIC)
-             ========================= */}
           {!isAdminRoute && !isAuthPage && !isAuthenticated && (
             <>
               <button
@@ -105,11 +102,8 @@ const Header: React.FC = () => {
               </button>
             </>
           )}
-
-          {/* =========================
-              USER DROPDOWN
-             ========================= */}
-          {!isAdminRoute && isAuthenticated && user && (
+          
+          {!isAdminRoute && !isAuthPage &&isAuthenticated && user && (
             <div className="flex items-center gap-3">
               <NotificationBell />
               <div className="relative">

@@ -9,20 +9,57 @@ export default function ConversationSidebar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await api.get("/chat/conversations");
-        setConversations(res.data);
-      } catch (err) {
-        console.error("Failed to fetch conversations", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchConversations();
-  }, [activeId]);
+useEffect(() => {
 
+  const fetchConversations = async () => {
+
+    try {
+
+      const res =
+        await api.get(
+          "/chat/conversations"
+        );
+
+      setConversations(
+        res.data
+      );
+
+    } catch (err) {
+
+      console.error(
+        "Failed to fetch conversations",
+        err
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  // INITIAL LOAD
+  fetchConversations();
+
+  // LISTEN FOR REALTIME MESSAGE
+  const handleNewMessage = () => {
+
+    fetchConversations();
+  };
+
+  window.addEventListener(
+    "new_message_received",
+    handleNewMessage
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "new_message_received",
+      handleNewMessage
+    );
+  };
+
+}, [activeId]);
   return (
     <div className="w-[350px] bg-white border-r border-gray-100 h-[600px] flex flex-col rounded-l-3xl shadow-sm">
       <div className="p-6 border-b border-gray-50 bg-gray-50/50 rounded-tl-3xl">

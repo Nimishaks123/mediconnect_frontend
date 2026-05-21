@@ -8,7 +8,7 @@ export default function PaymentSuccessPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-xl shadow max-w-md text-center">
         <h1 className="text-2xl font-semibold text-green-600 mb-3">
-          Payment Successful 🎉
+          Payment Successful! 
         </h1>
 
         <p className="text-gray-600 mb-4">

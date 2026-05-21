@@ -2,13 +2,26 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import { api } from "../../api/api";
 
 export interface Message {
+
   id: string;
+
   senderId: string;
+
   receiverId: string;
+
   conversationId: string;
+
   content: string;
+
   createdAt: string;
-  status: "sent" | "delivered" | "seen";
+
+  status:
+    "sent" |
+    "delivered" |
+    "seen";
+
+  attachmentUrl?: string;
+  attachmentType?: string;
 }
 
 interface ChatState {
@@ -37,13 +50,35 @@ export const fetchMessages = createAsyncThunk(
   }
 );
 
-export const sendMessage = createAsyncThunk(
-  "chat/sendMessage",
-  async (data: { receiverId: string; conversationId: string; content: string }) => {
-    const response = await api.post("/chat/messages", data);
-    return response.data;
-  }
-);
+export const sendMessage =
+  createAsyncThunk(
+
+    "chat/sendMessage",
+
+    async (
+      data: {
+
+        receiverId: string;
+
+        conversationId: string;
+
+        content?: string;
+
+        attachmentUrl?: string;
+
+        attachmentType?: string;
+      }
+    ) => {
+
+      const response =
+        await api.post(
+          "/chat/messages",
+          data
+        );
+
+      return response.data;
+    }
+  );
 
 export const markConversationAsRead = createAsyncThunk(
   "chat/markAsRead",

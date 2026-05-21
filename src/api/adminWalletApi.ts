@@ -1,8 +1,8 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export const adminWalletApi = {
   getWallets: (params: { page: number; limit: number; search?: string; sort?: string }) =>
-    api.get("/admin/wallets", { params }),
+    api.get( API_ENDPOINTS.ADMIN_WALLETS.GET_ALL, { params }),
     
   getTransactions: (userId: string, params: { 
     page: number; 
@@ -11,5 +11,5 @@ export const adminWalletApi = {
     search?: string; 
     sort?: string 
   }) =>
-    api.get(`/admin/wallets/${userId}/transactions`, { params }),
+    api.get( API_ENDPOINTS.ADMIN_WALLETS.GET_TRANSACTIONS(userId), { params }),
 };

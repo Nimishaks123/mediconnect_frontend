@@ -2,8 +2,8 @@
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import { ROLES } from "../constants/roles";
-import UserLayout from "../layouts/UserLayout";
-
+//import UserLayout from "../layouts/UserLayout";
+import PatientDashboardLayout from "../components/layout/PatientDashboardLayout";
 import UserDashboard from "../pages/UserDashboard";
 import DoctorListPage from "../pages/DoctorListPage";
 import DoctorAvailabilityPage from "../pages/DoctorAvailabilityPage";
@@ -15,12 +15,14 @@ import PatientProfilePage from "../pages/PatientProfilePage";
 
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentCancelledPage from "../pages/PaymentCancelledPage";
+import DoctorDetailsPage from "../pages/DoctorDetailsPage";
 
 import { ROUTES } from "../constants/routes";
 
 export const PatientRoutes = () => (
   <Route element={<ProtectedRoute allowedRoles={[ROLES.PATIENT]} />}>
-    <Route element={<UserLayout />}>
+    {/* <Route element={<UserLayout />}> */}
+    <Route element={<PatientDashboardLayout />}>
       <Route path={ROUTES.USER_DASHBOARD} element={<UserDashboard />} />
       <Route path={ROUTES.DOCTORS} element={<DoctorListPage />} />
       <Route path={ROUTES.DOCTOR_AVAILABILITY} element={<DoctorAvailabilityPage />} />
@@ -31,6 +33,10 @@ export const PatientRoutes = () => (
       <Route path={ROUTES.PATIENT_PROFILE} element={<PatientProfilePage />} />
       <Route path="/payment-success/:appointmentId" element={<PaymentSuccessPage />} />
       <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
+      <Route
+  path="/doctors/:doctorId"
+  element={<DoctorDetailsPage />}
+/>
     </Route>
   </Route>
 );

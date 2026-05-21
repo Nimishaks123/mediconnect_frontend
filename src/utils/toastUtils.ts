@@ -1,12 +1,6 @@
 import toast from "react-hot-toast";
 
-/**
- * Centralized Toast Utility
- * Enforces consistent styling and prevents duplicate notifications
- */
-
-// Track active toasts to prevent duplicates if needed
-// const activeToasts = new Set<string>();
+// Centralized Toast 
 
 export const showSuccess = (message: string, id?: string) => {
   toast.success(message, { id });

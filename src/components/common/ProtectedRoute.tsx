@@ -13,7 +13,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const { user, accessToken, status, isInitialized } = useAppSelector(selectAuth);
   const location = useLocation();
 
-  // 1. Wait for initialization (initial token check)
+  // 1. initial token check
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -22,12 +22,12 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     );
   }
 
-  // 2. If we have no token, definitely not logged in
+  // 2. If no token,  not logged in
   if (!accessToken) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
-  // 3. If we have a token but no user, and we're not loading something else
+  // 3. If  have token but no user
   if (!user && status !== "loading") {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
@@ -43,7 +43,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
 
   if (!user) return null;
 
-  // 🔒 Doctor onboarding check
+  // Doctor onboarding check
   if (user.role === "DOCTOR") {
     const path = location.pathname;
     const isAccessingOnboarding = path.startsWith("/doctor/onboarding");
@@ -69,7 +69,7 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     }
   }
 
-  // 🔒 Role-based protection
+  // Role-based protection
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     const fallback =
       user.role === "ADMIN"

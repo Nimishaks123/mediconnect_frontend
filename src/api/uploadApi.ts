@@ -1,16 +1,12 @@
 import { api } from "./api";
 import axios from "axios";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export const uploadApi = {
-  /**
-   * Fetches a signed signature from the backend for direct upload to Cloudinary.
-   */
+  //Fetches a signed signature from the backend for direct upload to Cloudinary.
   getSignature: (folder: string = "mediconnect/profiles") => 
-    api.get(`/upload/signature?folder=${folder}`),
-
-  /**
-   * Uploads a file directly to Cloudinary using a signed signature.
-   */
+    api.get(`${API_ENDPOINTS.UPLOADS.GET_SIGNATURE}?folder=${folder}`),
+   // Uploads  file directly to Cloudinary using signed signature.
+   
   uploadToCloudinary: async (file: File, signatureData: any) => {
     const { timestamp, signature, apiKey, cloudName } = signatureData;
     
@@ -19,7 +15,7 @@ export const uploadApi = {
     formData.append("api_key", apiKey);
     formData.append("timestamp", timestamp.toString());
     formData.append("signature", signature);
-    formData.append("folder", "mediconnect/profiles"); // Must match backend folder
+    formData.append("folder", signatureData.folder); 
 
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,

@@ -32,6 +32,8 @@ export const ROUTES = {
   DOCTOR_REJECTED: "/doctor/rejected",
   DOCTORS: "/doctors",
   DOCTOR_AVAILABILITY: "/doctors/:doctorId/availability",
+  DOCTOR_DETAILS: (doctorId: string) =>
+  `/doctors/${doctorId}`,
 
   // ADMIN
   ADMIN_LOGIN: "/admin/login",

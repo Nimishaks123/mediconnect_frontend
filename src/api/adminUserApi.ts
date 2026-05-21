@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export interface AdminUser {
   id: string;
   name: string;
@@ -22,13 +23,13 @@ export interface GetAllUsersResponse {
 }
 export const adminUserApi = {
   getAllUsers: (params: GetAllUsersParams) =>
-    api.get<GetAllUsersResponse>("/admin/users", {
+    api.get<GetAllUsersResponse>(API_ENDPOINTS.ADMIN_USERS.GET_ALL, {
       params,
     }),
 
   blockUser: (userId: string) =>
-    api.post("/admin/block-user", { userId }),
+    api.post( API_ENDPOINTS.ADMIN_USERS.BLOCK,{ userId }),
 
   unblockUser: (userId: string) =>
-    api.post("/admin/unblock-user", { userId }),
+    api.post(API_ENDPOINTS.ADMIN_USERS.UNBLOCK, { userId }),
 };

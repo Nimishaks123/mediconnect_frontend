@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/* ───────────── Time window ───────────── */
+//Time window 
 export const timeWindowSchema = z.object({
   start: z
     .string()
@@ -16,7 +16,7 @@ export const timeWindowSchema = z.object({
   }
 );
 
-/* ───────────── Main form schema ───────────── */
+// Main form schema
 export const scheduleSchema = z.object({
   slotDuration: z
     .number()

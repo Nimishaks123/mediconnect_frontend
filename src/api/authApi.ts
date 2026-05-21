@@ -1,6 +1,6 @@
 import { api } from "./api";
 import type { Role } from "../store/auth/authSlice";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -22,14 +22,15 @@ export interface SignupPayload {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<LoginResponse>("/auth/login", { email, password }),
+    api.post<LoginResponse>( API_ENDPOINTS.AUTH.LOGIN, { email, password }),
 
-  signup: (data: SignupPayload) => api.post("/auth/signup", data),
+  signup: (data: SignupPayload) => api.post( API_ENDPOINTS.AUTH.SIGNUP, data),
 
   getMe: () => 
-    api.get<{ success: boolean; user: LoginResponse['user'] }>("/auth/me"),
+    api.get<{ success: boolean; user: LoginResponse['user'] }>( API_ENDPOINTS.AUTH.ME),
 
   logout: () => 
-    api.post("/auth/logout"),
+    api.post(API_ENDPOINTS.AUTH.LOGOUT
+    ),
 };
 

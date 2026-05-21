@@ -44,7 +44,6 @@ export default function DoctorProfilePage() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const profilePhotoRef = useRef<HTMLInputElement>(null);
 
-  // Sync local edit form with global profile once it loads
   useEffect(() => {
     if (profile) {
       setEditForm({
@@ -60,18 +59,18 @@ export default function DoctorProfilePage() {
     }
   }, [profile, dispatch]);
 
-  // 📌 PART 7 & 8: INSTANT PHOTO UPDATE
+  //  PHOTO UPDATE
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 1️⃣ Validate: ONLY Image
+    //  Validate: ONLY Image
     if (!file.type.startsWith("image/")) {
       showError("Please upload an image file");
       return;
     }
 
-    // 2️⃣ Validate: Max 2MB
+    // Validate: Max 2MB
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       showError("Profile photo must be smaller than 2MB");
@@ -82,16 +81,16 @@ export default function DoctorProfilePage() {
     const loadingToast = showLoading("Uploading new photo...");
 
     try {
-      // 3️⃣ DIRECT UPLOAD to Cloudinary
+      // DIRECT UPLOAD to Cloudinary
       const signatureResponse = await uploadApi.getSignature("mediconnect/profiles");
       const imageUrl = await uploadApi.uploadToCloudinary(file, signatureResponse.data);
 
-      // 4️⃣ CALL UPDATE API (Instant)
+      // CALL UPDATE API
       await doctorOnboardingApi.updateBasicInfo({
         profilePhoto: imageUrl
       });
 
-      // 5️⃣ UPDATE REDUX STORE
+      //  UPDATE REDUX STORE
       dispatch(fetchDoctorProfile());
       setEditForm((prev: any) => ({ ...prev, profilePhoto: imageUrl }));
       

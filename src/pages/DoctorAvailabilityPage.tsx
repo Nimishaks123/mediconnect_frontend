@@ -23,21 +23,46 @@ export default function DoctorAvailabilityPage() {
     }
   }, [dispatch, doctorId, date]);
 
-  const handleBook = async (availabilityId: string) => {
-    try {
-      await dispatch(
-        bookAppointmentThunk({
-          doctorId: doctorId!,
-          availabilityId,
-        })
-      ).unwrap();
+const handleBook = async (
+  slot: any
+) => {
 
-      toast.success("Appointment booked successfully");
-    } catch (err) {
-      toast.error(String(err));
-    }
-  };
+  try {
 
+    const start =
+      slot.start ||
+      slot.startTime;
+
+    const end =
+      slot.end ||
+      slot.endTime;
+
+    const slotId =
+`${doctorId}_${slot.date}_${start}_${end}`;
+
+    console.log(
+      "Generated slotId:",
+      slotId
+    );
+
+    await dispatch(
+      bookAppointmentThunk({
+        doctorId: doctorId!,
+        slotId,
+        date: slot.date,
+      })
+    ).unwrap();
+
+    toast.success(
+      "Appointment booked successfully"
+    );
+
+  } catch (err) {
+
+    toast.error(String(err));
+
+  }
+};
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <h2 className="text-2xl font-semibold mb-6">
@@ -61,12 +86,14 @@ export default function DoctorAvailabilityPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {availability.map((slot) => (
           <button
-            key={slot.id}
-            onClick={() => handleBook(slot.id)}
+          key={`${slot.date}-${slot.start}-${slot.end}`}
+            onClick={() => handleBook(slot)}
             className="border rounded-lg p-4 hover:bg-blue-50"
           >
             <p className="font-medium">
-              {slot.startTime} – {slot.endTime}
+            {slot.start || slot.startTime}
+{" – "}
+{slot.end || slot.endTime}
             </p>
           </button>
         ))}

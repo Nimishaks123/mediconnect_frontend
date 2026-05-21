@@ -1,5 +1,5 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export interface AdminLoginResponse {
   accessToken: string;
   refreshToken: string;
@@ -13,6 +13,6 @@ export interface AdminLoginResponse {
 
 export const adminAuthApi = {
   login: (email: string, password: string) =>
-    api.post<AdminLoginResponse>("/admin/auth/login", { email, password }),
+    api.post<AdminLoginResponse>(API_ENDPOINTS.ADMIN_AUTH.LOGIN, { email, password }),
 };
 

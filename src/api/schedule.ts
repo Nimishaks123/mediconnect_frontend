@@ -1,5 +1,5 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export interface DoctorSlot {
   date: string;        // YYYY-MM-DD
   startTime: string;   // HH:mm
@@ -37,17 +37,16 @@ export interface CreateDoctorSchedulePayload {
   timezone?: string;
 }
 
-/* ================= DOCTOR APIs ================= */
 
 export const createDoctorSchedule = (
   data: CreateDoctorSchedulePayload
 ) => {
-  return api.post("/doctor/schedules", data);
+  return api.post(API_ENDPOINTS.DOCTOR_SCHEDULES.CREATE, data);
 };
 
 export const getDoctorSlots = (from: string, to: string) => {
   return api.get<DoctorSlot[]>(
-    "/doctor/schedules/slots",
+    API_ENDPOINTS.DOCTOR_SCHEDULES.GET_SLOTS,
     { params: { from, to } }
   );
 };
@@ -84,7 +83,9 @@ export const getDoctorSlotsForPatient = (
   to: string
 ) => {
   return api.get<DoctorSlot[]>(
-    `/patient/doctors/slots/${doctorId}`,
+    API_ENDPOINTS.PATIENT_DOCTORS.GET_AVAILABILITY(
+      doctorId
+    ),
     {
       params: { from, to }
     }
@@ -95,13 +96,15 @@ export const getDoctorSlotsWithBooking = (
   to: string
 ) => {
   return api.get<DoctorSlotWithBooking[]>(
-    "/doctor/schedules/slots-with-booking",
+    API_ENDPOINTS.DOCTOR_SCHEDULES.GET_SLOTS_WITH_BOOKING,
     { params: { from, to } }
   );
 };
 
 export const deleteSlot = (slotId: string) => {
-  return api.delete(`/doctor/schedules/slots/${slotId}`);
+  return api.delete( API_ENDPOINTS.DOCTOR_SCHEDULES.DELETE_SLOT(
+      slotId
+    ));
 };
 
 

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchVerifiedDoctors } from "../store/appointments/appointmentThunks";
-import DoctorCard from "../components/doctor/dashboard/DoctorCard";
+//import DoctorCard from "../components/doctor/dashboard/DoctorCard";
+import SpecialistsList from "../components/dashboard/SpecialistsList";
 import { useNavigate } from "react-router-dom";
 
 
@@ -51,15 +52,10 @@ export default function DoctorListPage() {
         Available Doctors
       </h2>
 
-      <div className="grid gap-4">
-        {doctors.map((doctor) => (
-          <DoctorCard
-            key={doctor.id}
-            doctor={doctor}
-            onSelect={handleSelectDoctor}
-          />
-        ))}
-      </div>
+       <SpecialistsList
+      doctors={doctors}
+      loading={loading}
+    />
     </div>
   );
 }

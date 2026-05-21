@@ -9,9 +9,6 @@ import type { Doctor } from "../../types/Doctor";
 import type { DoctorAvailability } from "../../types/DoctorAvailability";
 
 
-/* ================= DOCTORS ================= */
-
-
 export const fetchVerifiedDoctors = createAsyncThunk<
   Doctor[],
   void,
@@ -57,26 +54,53 @@ export const fetchDoctorAvailability = createAsyncThunk<
     }
   }
 );
+export const bookAppointmentThunk =
+  createAsyncThunk<
+    boolean,
+    {
+      doctorId: string;
+      slotId: string;
+      date?: string;
+    },
+    { rejectValue: string }
+  >(
+    "appointments/bookAppointment",
 
-// Book appointment
-export const bookAppointmentThunk = createAsyncThunk<
-  boolean,
-  { doctorId: string; availabilityId: string },
-  { rejectValue: string }
->(
-  "appointments/bookAppointment",
-  async ({ doctorId, availabilityId }, { rejectWithValue }) => {
-    try {
-      await bookAppointment({ doctorId, availabilityId });
-      return true;
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
+    async (
+      {
+        doctorId,
+        slotId,
+        date,
+      },
+      { rejectWithValue }
+    ) => {
+
+      try {
+
+        await bookAppointment({
+          doctorId,
+          slotId,
+          date,
+        });
+
+        return true;
+
+      } catch (error: unknown) {
+
+        if (
+          axios.isAxiosError(error)
+        ) {
+
+          return rejectWithValue(
+            error.response?.data
+              ?.message ||
+              "Booking failed"
+          );
+        }
+
         return rejectWithValue(
-          error.response?.data?.message ||
-            "Booking failed"
+          "Unexpected error occurred"
         );
       }
-      return rejectWithValue("Unexpected error occurred");
     }
-  }
-);
+  );

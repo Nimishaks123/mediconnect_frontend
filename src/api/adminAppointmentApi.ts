@@ -1,5 +1,5 @@
 import { api } from "./api";
-
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
 export const adminAppointmentApi = {
   getAppointments: (params: { 
     page: number; 
@@ -9,8 +9,8 @@ export const adminAppointmentApi = {
     search?: string; 
     sort?: string 
   }) =>
-    api.get("/admin/appointments", { params }),
+    api.get(API_ENDPOINTS.ADMIN_APPOINTMENTS.GET_ALL, { params }),
     
   getAppointmentDetails: (id: string) =>
-    api.get(`/admin/appointments/${id}`),
+    api.get(API_ENDPOINTS.ADMIN_APPOINTMENTS.GET_DETAILS(id)),
 };

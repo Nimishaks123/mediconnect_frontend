@@ -1,36 +1,111 @@
+
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 import {
   getDoctorSlotsForPatient,
 } from "../api/schedule";
-import type { DoctorSlot } from "../api/schedule";
-import { createAppointment } from "../api/appointments";
-import { createCheckoutSession } from "../api/paymentApi";
+
+import type {
+  DoctorSlot,
+} from "../api/schedule";
+
+import {
+  createAppointment,
+} from "../api/appointments";
+
+import {
+  createCheckoutSession,
+} from "../api/paymentApi";
+
+import {
+  getMyWallet,
+  payWithWallet,
+} from "../api/patientAppointments";
+
 import { toast } from "react-hot-toast";
 
 const DAYS_TO_SHOW = 7;
 
-const getLocalDateString = (date: Date) => {
+const getLocalDateString = (
+  date: Date
+) => {
+
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
+
+  const m = String(
+    date.getMonth() + 1
+  ).padStart(2, "0");
+
+  const d = String(
+    date.getDate()
+  ).padStart(2, "0");
+
   return `${y}-${m}-${d}`;
 };
 
 export default function DoctorAppointmentPage() {
-  const { doctorId } = useParams<{ doctorId: string }>();
 
-  const today = getLocalDateString(new Date());
+  const navigate = useNavigate();
 
-  const [selectedDate, setSelectedDate] = useState(today);
-  const [slots, setSlots] = useState<DoctorSlot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<DoctorSlot | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { doctorId } =
+    useParams<{
+      doctorId: string;
+    }>();
 
+  const today =
+    getLocalDateString(
+      new Date()
+    );
+
+  const [
+    selectedDate,
+    setSelectedDate,
+  ] = useState(today);
+
+  const [
+    slots,
+    setSlots,
+  ] = useState<DoctorSlot[]>(
+    []
+  );
+
+  const [
+    selectedSlot,
+    setSelectedSlot,
+  ] = useState<DoctorSlot | null>(
+    null
+  );
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    paymentMethod,
+    setPaymentMethod
+  ] = useState<
+    "STRIPE" | "WALLET"
+  >("STRIPE");
+
+  const [
+    walletBalance,
+    setWalletBalance
+  ] = useState(0);
+
+  // FETCH SLOTS
   useEffect(() => {
-    if (!doctorId || doctorId === "undefined") return;
+
+    if (
+      !doctorId ||
+      doctorId === "undefined"
+    ) {
+      return;
+    }
 
     setLoading(true);
+
     setSelectedSlot(null);
 
     getDoctorSlotsForPatient(
@@ -39,189 +114,426 @@ export default function DoctorAppointmentPage() {
       selectedDate
     )
       .then((res) => {
+
         setSlots(res.data);
+
       })
       .catch(() => {
-        // quiet fail
+
+        toast.error(
+          "Failed to load slots"
+        );
+
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+
+        setLoading(false);
+
+      });
+
   }, [doctorId, selectedDate]);
 
+  // FETCH WALLET
+  useEffect(() => {
+
+    getMyWallet()
+      .then((res) => {
+
+        setWalletBalance(
+          res.balance || 0
+        );
+
+      })
+      .catch(() => {
+
+        console.log(
+          "Failed to fetch wallet"
+        );
+
+      });
+
+  }, []);
+
   const getNextDays = () => {
-    return Array.from({ length: DAYS_TO_SHOW }).map((_, i) => {
+
+    return Array.from({
+      length: DAYS_TO_SHOW,
+    }).map((_, i) => {
+
       const d = new Date();
-      d.setDate(d.getDate() + i);
+
+      d.setDate(
+        d.getDate() + i
+      );
+
       return getLocalDateString(d);
+
     });
+
   };
 
+  // FILTER EXPIRED SLOTS
   const slotsForDate = slots.filter(
-    (slot) => slot.date === selectedDate
+    (slot) => {
+
+      if (
+        slot.date !==
+        selectedDate
+      ) {
+        return false;
+      }
+
+      const now =
+        new Date();
+
+      const slotEndDateTime =
+        new Date(
+          `${slot.date}T${slot.endTime}`
+        );
+
+      return (
+        slotEndDateTime > now
+      );
+    }
   );
 
-  // const handleConfirmAppointment = async () => {
-  //   if (!selectedSlot || !doctorId) return;
+  const handleConfirmAppointment =
+    async () => {
 
-  //   try {
-  //     setLoading(true);
+      if (
+        !selectedSlot ||
+        !doctorId ||
+        doctorId === "undefined"
+      ) {
+        return;
+      }
 
-  //     //Create appointment (PAYMENT_PENDING)
-  //     const appointmentRes = await createAppointment({
-  //       doctorId,
-  //       date: selectedDate,
-  //       startTime: selectedSlot.startTime,
-  //       endTime: selectedSlot.endTime,
-  //     });
+      try {
 
-  //     const appointmentId = appointmentRes.appointmentId;
+        setLoading(true);
 
-  //     // Create Stripe Checkout session
-  //     const paymentRes = await createCheckoutSession(
-  //       appointmentId
-  //     );
+        const start =
+          selectedSlot.startTime;
 
-  //     // Redirect to Stripe  checkout
-  //     window.location.href = paymentRes.checkoutUrl;
+        const end =
+          selectedSlot.endTime;
 
-  //   } catch (err: any) {
-  //     alert(
-  //       err.response?.data?.message ||
-  //       "Unable to proceed to payment"
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  const handleConfirmAppointment = async () => {
-  if (!selectedSlot || !doctorId || doctorId === "undefined") return;
+        const slotId =
+`${doctorId}_${selectedDate}_${start}_${end}`;
 
-  try {
-    setLoading(true);
+        // CREATE APPOINTMENT
+        const appointmentRes =
+          await createAppointment({
+            doctorId,
+            slotId,
+            date: selectedDate,
+          });
 
-    // Create slotId (concatenated format for backend parsing)
-    const slotId = `${doctorId}_${selectedDate}_${selectedSlot.startTime}_${selectedSlot.endTime}`;
-    console.log("Sending slotId:", slotId);
+        const appointmentId =
+          appointmentRes._id ||
+          appointmentRes.appointmentId;
 
-    const appointmentRes = await createAppointment({
+        // WALLET PAYMENT
+        if (
+          paymentMethod ===
+          "WALLET"
+        ) {
 
-      doctorId,
-      slotId,
-      date: selectedDate,
-    });
+          await payWithWallet(
+            appointmentId
+          );
 
-    const appointmentId = appointmentRes._id || appointmentRes.appointmentId;
-    console.log("Checkout appointmentId:", appointmentId);
+          toast.success(
+            "Appointment confirmed using wallet"
+          );
 
-    // Create Stripe Checkout session
-    const paymentRes = await createCheckoutSession(appointmentId);
+          navigate(
+            "/patient/appointments"
+          );
 
+          return;
+        }
 
-    // Redirect to Stripe
-    window.location.href = paymentRes.checkoutUrl;
+        // STRIPE PAYMENT
+        const paymentRes =
+          await createCheckoutSession(
+            appointmentId
+          );
 
-  } catch (err: unknown) {
-    const error = err as { response?: { data?: { message?: string } } };
-    toast.error(
-      error.response?.data?.message ||
-      "Unable to proceed to payment"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+        window.location.href =
+          paymentRes.checkoutUrl;
+
+      } catch (err: unknown) {
+
+        const error =
+          err as {
+            response?: {
+              data?: {
+                message?: string;
+              };
+            };
+          };
+
+        toast.error(
+          error.response?.data
+            ?.message ||
+          "Unable to proceed to payment"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">
+    <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+
+      {/* HEADER */}
+      <div className="space-y-2">
+
+        <h1 className="text-3xl font-bold text-gray-900">
           Book Appointment
         </h1>
-        <p className="text-gray-500 text-sm">
-          Choose a date and available time slot
+
+        <p className="text-gray-500">
+          Choose your preferred consultation slot
         </p>
+
       </div>
 
-      {/* DATE PICKER */}
-      <div>
-        <h2 className="text-sm font-medium mb-2">
-          Choose Date
+      {/* DATE SELECTOR */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">
+          Select Date
         </h2>
 
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {getNextDays().map((date) => (
-            <button
-              key={date}
-              onClick={() => setSelectedDate(date)}
-              className={`px-4 py-2 rounded-lg border text-sm whitespace-nowrap
+        <div className="flex gap-3 overflow-x-auto pb-1">
+
+          {getNextDays().map(
+            (date) => (
+
+              <button
+                key={date}
+                onClick={() =>
+                  setSelectedDate(
+                    date
+                  )
+                }
+                className={`px-4 py-3 rounded-xl border text-sm whitespace-nowrap transition-all
                 ${
                   selectedDate === date
-                    ? "bg-sky-600 text-white border-sky-600"
-                    : "bg-white hover:bg-sky-50"
+                    ? "bg-sky-600 text-white border-sky-600 shadow-sm"
+                    : "bg-white hover:bg-sky-50 border-gray-200"
                 }`}
-            >
-              {new Date(date).toDateString().slice(0, 10)}
-            </button>
-          ))}
+              >
+
+                {new Date(date)
+                  .toDateString()
+                  .slice(0, 10)}
+
+              </button>
+            )
+          )}
+
         </div>
       </div>
 
-      {/* SLOTS */}
-      <div>
-        <h2 className="text-sm font-medium mb-3">
-          Available Slots
-        </h2>
+      {/* SLOT SECTION */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+
+        <div className="flex items-center justify-between mb-5">
+
+          <h2 className="text-lg font-semibold text-gray-800">
+            Available Slots
+          </h2>
+
+          {!loading &&
+            slotsForDate.length > 0 && (
+              <span className="text-sm text-gray-500">
+                {slotsForDate.length} slots available
+              </span>
+            )}
+
+        </div>
 
         {loading && (
           <p className="text-gray-500 text-sm">
-            Loading available slots…
+            Loading available slots...
           </p>
         )}
 
-        {!loading && slotsForDate.length === 0 && (
-          <p className="text-gray-500 text-sm">
-            No slots available for this date
-          </p>
-        )}
+        {!loading &&
+          slotsForDate.length === 0 && (
+            <div className="text-center py-10">
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {slotsForDate.map((slot, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedSlot(slot)}
-              className={`border rounded-lg p-3 text-sm transition
-                ${
-                  selectedSlot === slot
-                    ? "bg-sky-600 text-white border-sky-600"
-                    : "hover:bg-sky-50"
-                }`}
-            >
-              {slot.startTime} – {slot.endTime}
-            </button>
-          ))}
+              <p className="text-gray-500">
+                No slots available for this date
+              </p>
+
+            </div>
+          )}
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+          {slotsForDate.map(
+            (slot) => {
+
+              const isSelected =
+                selectedSlot === slot;
+
+              return (
+                <button
+                  key={`${slot.date}-${slot.startTime}-${slot.endTime}`}
+                  onClick={() =>
+                    setSelectedSlot(slot)
+                  }
+                  className={`rounded-2xl border p-4 text-left transition-all
+                  ${
+                    isSelected
+                      ? "bg-sky-600 text-white border-sky-600 shadow-md"
+                      : "bg-white hover:bg-sky-50 border-gray-200"
+                  }`}
+                >
+
+                  <p className="font-semibold text-sm">
+                    {slot.startTime} – {slot.endTime}
+                  </p>
+
+                  <p
+                    className={`text-xs mt-2
+                    ${
+                      isSelected
+                        ? "text-sky-100"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    Available
+                  </p>
+
+                </button>
+              );
+            }
+          )}
+
         </div>
       </div>
 
-      {/* CONFIRM */}
+      {/* CONFIRM SECTION */}
       {selectedSlot && (
-        <div className="border rounded-xl p-4 bg-sky-50">
-          <p className="text-sm mb-2">
-            Selected Slot:
-          </p>
 
-          <p className="font-medium">
-            {new Date(selectedDate).toDateString()} <br />
-            {selectedSlot.startTime} – {selectedSlot.endTime}
-          </p>
+        <div className="bg-sky-50 border border-sky-100 rounded-2xl p-6 shadow-sm">
+
+          <h3 className="font-semibold text-gray-900 mb-3">
+            Selected Appointment
+          </h3>
+
+          <div className="space-y-2 text-sm text-gray-700">
+
+            <p>
+              <span className="font-medium">
+                Date:
+              </span>{" "}
+              {new Date(
+                selectedDate
+              ).toDateString()}
+            </p>
+
+            <p>
+              <span className="font-medium">
+                Time:
+              </span>{" "}
+              {selectedSlot.startTime}
+              {" – "}
+              {selectedSlot.endTime}
+            </p>
+
+          </div>
+
+          {/* PAYMENT METHOD */}
+          <div className="mt-5 space-y-3">
+
+            <h4 className="font-semibold text-gray-800">
+              Payment Method
+            </h4>
+
+            {/* WALLET */}
+            <label className="flex items-center justify-between border rounded-xl p-4 bg-white cursor-pointer">
+
+              <div>
+                <p className="font-medium">
+                  Wallet Balance
+                </p>
+
+                <p className="text-sm text-gray-500">
+                  ₹{walletBalance}
+                </p>
+              </div>
+
+              <input
+                type="radio"
+                checked={
+                  paymentMethod ===
+                  "WALLET"
+                }
+                onChange={() =>
+                  setPaymentMethod(
+                    "WALLET"
+                  )
+                }
+              />
+
+            </label>
+
+            {/* STRIPE */}
+            <label className="flex items-center justify-between border rounded-xl p-4 bg-white cursor-pointer">
+
+              <div>
+                <p className="font-medium">
+                  Stripe / Card
+                </p>
+
+                <p className="text-sm text-gray-500">
+                  Secure online payment
+                </p>
+              </div>
+
+              <input
+                type="radio"
+                checked={
+                  paymentMethod ===
+                  "STRIPE"
+                }
+                onChange={() =>
+                  setPaymentMethod(
+                    "STRIPE"
+                  )
+                }
+              />
+
+            </label>
+
+          </div>
 
           <button
-            onClick={handleConfirmAppointment}
+            onClick={
+              handleConfirmAppointment
+            }
             disabled={loading}
-            className="mt-4 w-full bg-sky-600 text-white py-2 rounded-lg font-medium hover:bg-sky-700 disabled:opacity-50"
+            className="mt-6 w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-xl font-semibold transition-all disabled:opacity-50"
           >
-            Proceed to Payment
+
+            {loading
+              ? "Processing..."
+              : "Proceed to Payment"}
+
           </button>
+
         </div>
       )}
+
     </div>
   );
 }
