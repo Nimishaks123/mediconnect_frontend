@@ -19,6 +19,10 @@ useEffect(() => {
         await api.get(
           "/chat/conversations"
         );
+        console.log(
+  "Conversations:",
+  res.data
+);
 
       setConversations(
         res.data

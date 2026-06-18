@@ -65,6 +65,7 @@ const VideoCallPage: React.FC = () => {
     socket?.off("user_left");
     socket?.off("call_rejected");
     socket?.emit("leave_call", { appointmentId });
+    socket?.off("call_ended");
   };
 
   useEffect(() => {
@@ -79,6 +80,7 @@ const VideoCallPage: React.FC = () => {
 
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setLocalStream(stream);
+        setupSignaling(stream);
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
 
         if (!socket) {
@@ -92,7 +94,7 @@ const VideoCallPage: React.FC = () => {
           hasJoinedRoom.current = true;
         }
 
-        setupSignaling();
+       // setupSignaling();
 
       } catch (err) {
         console.error(`[${role}] Video Call Error:`, err);
@@ -107,8 +109,25 @@ const VideoCallPage: React.FC = () => {
       cleanupCall();
     };
   }, [appointmentId, socket]);
+  useEffect(() => {
+  if (
+    remoteStream &&
+    remoteVideoRef.current
+  ) {
+    console.log(
+      `[${role}] ATTACHING REMOTE STREAM`
+    );
 
-  const setupSignaling = () => {
+    remoteVideoRef.current.srcObject =
+      remoteStream;
+
+    remoteVideoRef.current
+      .play()
+      .catch(console.error);
+  }
+}, [remoteStream]);
+
+  const setupSignaling = (stream:MediaStream) => {
     if (!socket) return;
 
     // Reset guards for the case of re-initialization
@@ -131,7 +150,7 @@ const VideoCallPage: React.FC = () => {
       }
       hasHandledPeerJoin.current = true;
 
-      const pc = getOrCreatePC();
+      const pc = getOrCreatePC(stream);
       if (!pc || pc.signalingState === "closed") return;
 
       console.log(`[${role}] Peer joined. State: ${pc.signalingState}`);
@@ -155,7 +174,7 @@ const VideoCallPage: React.FC = () => {
         return;
       }
 
-      const pc = getOrCreatePC();
+      const pc = getOrCreatePC(stream);
       if (!pc || pc.signalingState === "closed") return;
 
       if (pc.signalingState !== "stable") {
@@ -195,23 +214,59 @@ const VideoCallPage: React.FC = () => {
     });
 
     socket.on("ice_candidate", async (data: { candidate: RTCIceCandidateInit }) => {
-      const pc = getOrCreatePC();
-      if (!pc || pc.signalingState === "closed") return;
+    //   const pc = getOrCreatePC(stream);
+    //   if (!pc || pc.signalingState === "closed") return;
 
-      try {
-        if (data.candidate) {
-          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-        }
-      } catch (err) {
-        console.error(`[${role}] Add ICE Candidate Error:`, err);
-      }
-    });
+    //   try {
+    //     if (data.candidate) {
+    //       await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    //     }
+    //   } catch (err) {
+    //     console.error(`[${role}] Add ICE Candidate Error:`, err);
+    //   }
+    // });
+    const pc = getOrCreatePC(stream);
+
+  console.log(
+    `[${role}] ICE RECEIVED`,
+    data.candidate
+  );
+
+  try {
+    if (data.candidate) {
+      await pc.addIceCandidate(
+        new RTCIceCandidate(data.candidate)
+      );
+    }
+  } catch (err) {
+    console.error(
+      `[${role}] ICE ERROR`,
+      err
+    );
+  }
+});
 
     socket.on("user_left", () => {
       console.log(`[${role}] Peer disconnected.`);
       showInfo("Peer disconnected.");
       setRemoteStream(null);
     });
+    socket.on(
+  "call_ended",
+  () => {
+    console.log(
+      `[${role}] Call ended by peer`
+    );
+
+    showInfo(
+      "Call ended by other participant"
+    );
+
+    cleanupCall();
+
+    navigate(-1);
+  }
+);
 
     socket.on("call_rejected", () => {
       console.log(`[${role}] Call rejected.`);
@@ -220,38 +275,220 @@ const VideoCallPage: React.FC = () => {
     });
   };
 
-  const getOrCreatePC = () => {
-    if (pcRef.current && pcRef.current.signalingState !== "closed") return pcRef.current;
 
-    if (!hasInitializedPC.current) {
-      console.log(`[${role}] Initializing PeerConnection once`);
-      const pc = new RTCPeerConnection(ICE_SERVERS);
+// const getOrCreatePC = (stream: MediaStream) => {
+//   if (
+//     pcRef.current &&
+//     pcRef.current.signalingState !== "closed"
+//   ) {
+//     return pcRef.current;
+//   }
 
-      if (localStream) {
-        localStream.getTracks().forEach(track => {
-          pc.addTrack(track, localStream);
-        });
-      }
+//   if (!hasInitializedPC.current) {
+//     console.log(
+//       `[${role}] Initializing PeerConnection once`
+//     );
 
-      pc.ontrack = (event) => {
-        console.log(`[${role}] Remote track received.`);
-        setRemoteStream(event.streams[0]);
-        if (remoteVideoRef.current) remoteVideoRef.current.srcObject = event.streams[0];
-      };
+//     const pc = new RTCPeerConnection(
+//       ICE_SERVERS
+//     );
 
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          socket?.emit("ice_candidate", { appointmentId, candidate: event.candidate });
-        }
-      };
+//     console.log(
+//       `[${role}] Tracks:`,
+//       stream.getTracks().length
+//     );
 
-      pcRef.current = pc;
-      hasInitializedPC.current = true;
-      return pc;
+//     stream.getTracks().forEach(track => {
+//       pc.addTrack(track, stream);
+//     });
+
+//     pc.ontrack = (event) => {
+//       console.log(
+//         `[${role}] REMOTE TRACK`,
+//         event.streams
+//       );
+
+//       setRemoteStream(
+//         event.streams[0]
+//       );
+
+//       if (remoteVideoRef.current) {
+//         remoteVideoRef.current.srcObject =
+//           event.streams[0];
+//       }
+//     };
+
+//     pc.onicecandidate = (event) => {
+//       console.log(
+//         `[${role}] ICE GENERATED`,
+//         event.candidate
+//       );
+
+//       if (event.candidate) {
+//         socket?.emit(
+//           "ice_candidate",
+//           {
+//             appointmentId,
+//             candidate:
+//               event.candidate,
+//           }
+//         );
+//       }
+//     };
+
+//     pcRef.current = pc;
+//     hasInitializedPC.current = true;
+
+//     return pc;
+//   }
+
+//   return pcRef.current!;
+// };
+
+//     const getOrCreatePC = (stream: MediaStream) => {
+//   if (
+//     pcRef.current &&
+//     pcRef.current.signalingState !== "closed"
+//   ) {
+//     return pcRef.current;
+//   }
+
+//   console.log(`[${role}] Initializing PeerConnection`);
+
+//   const pc = new RTCPeerConnection(ICE_SERVERS);
+
+//   stream.getTracks().forEach(track => {
+//     pc.addTrack(track, stream);
+//   });
+
+//   pc.ontrack = (event) => {
+//     console.log(
+//       `[${role}] REMOTE TRACK`,
+//       event.streams
+//     );
+
+//     const remote = event.streams[0];
+
+//     setRemoteStream(remote);
+
+//     if (remoteVideoRef.current) {
+//       remoteVideoRef.current.srcObject = remote;
+//     }
+//   };
+
+//   pc.onicecandidate = (event) => {
+//     console.log(
+//       `[${role}] ICE GENERATED`,
+//       event.candidate
+//     );
+
+//     if (event.candidate) {
+//       socket?.emit("ice_candidate", {
+//         appointmentId,
+//         candidate: event.candidate,
+//       });
+//     }
+//   };
+
+//   pc.onconnectionstatechange = () => {
+//     console.log(
+//       `[${role}] CONNECTION STATE`,
+//       pc.connectionState
+//     );
+//   };
+
+//   pc.oniceconnectionstatechange = () => {
+//     console.log(
+//       `[${role}] ICE STATE`,
+//       pc.iceConnectionState
+//     );
+//   };
+
+//   pcRef.current = pc;
+
+//   return pc;
+// };
+const getOrCreatePC = (stream: MediaStream) => {
+  if (
+    pcRef.current &&
+    pcRef.current.signalingState !== "closed"
+  ) {
+    return pcRef.current;
+  }
+
+  console.log(`[${role}] Initializing PeerConnection`);
+
+  const pc = new RTCPeerConnection(ICE_SERVERS);
+
+  stream.getTracks().forEach((track) => {
+    pc.addTrack(track, stream);
+  });
+
+  pc.ontrack = (event) => {
+    console.log(
+      `[${role}] REMOTE TRACK`,
+      event.streams
+    );
+
+    const remote = event.streams[0];
+
+  console.log(
+    `[${role}] Remote stream active:`,
+    remote.active
+  );
+
+  console.log(
+    `[${role}] Video tracks:`,
+    remote.getVideoTracks().length
+  );
+
+  console.log(
+    `[${role}] Audio tracks:`,
+    remote.getAudioTracks().length
+  );
+
+    setRemoteStream(remote);
+
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = remote;
+         console.log(
+      `[${role}] Attached to video element`
+    );
     }
-    
-    return pcRef.current!;
   };
+
+  pc.onicecandidate = (event) => {
+    console.log(
+      `[${role}] ICE GENERATED`,
+      event.candidate
+    );
+
+    if (event.candidate) {
+      socket?.emit("ice_candidate", {
+        appointmentId,
+        candidate: event.candidate,
+      });
+    }
+  };
+
+  pc.onconnectionstatechange = () => {
+    console.log(
+      `[${role}] CONNECTION STATE`,
+      pc.connectionState
+    );
+  };
+
+  pc.oniceconnectionstatechange = () => {
+    console.log(
+      `[${role}] ICE STATE`,
+      pc.iceConnectionState
+    );
+  };
+
+  pcRef.current = pc;
+
+  return pc;
+};
 
   const toggleMute = () => {
     if (localStream) {
@@ -270,6 +507,12 @@ const VideoCallPage: React.FC = () => {
   };
 
   const endCall = () => {
+    socket?.emit("end_call", {
+    appointmentId,
+  });
+
+  cleanupCall();
+
     navigate(-1);
   };
 
@@ -279,13 +522,23 @@ const VideoCallPage: React.FC = () => {
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-mediconnect-green to-transparent opacity-50" />
 
       <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute top-20 left-20 z-50 bg-red-500 text-white p-4">
+  {remoteStream ? "REMOTE FOUND" : "NO REMOTE"}
+</div>
         {remoteStream ? (
-          <video 
-            ref={remoteVideoRef} 
-            autoPlay 
-            playsInline 
-            className="w-full h-full object-cover animate-in fade-in duration-1000"
-          />
+          // <video 
+          //   ref={remoteVideoRef} 
+          //   autoPlay 
+          //   playsInline 
+          //   className="w-full h-full object-cover animate-in fade-in duration-1000"
+          // />
+          <video
+    ref={remoteVideoRef}
+    autoPlay
+    playsInline
+    muted={false}
+    className="w-full h-full object-cover border-4 border-red-500"
+  />
         ) : (
           <div className="flex flex-col items-center space-y-6 animate-in fade-in zoom-in duration-700">
              <div className="w-24 h-24 rounded-full bg-mediconnect-green/10 flex items-center justify-center border border-mediconnect-green/20">

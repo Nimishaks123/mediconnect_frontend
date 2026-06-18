@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -7,6 +7,7 @@ import {
   loginAdmin,
   selectAuthStatus,
   selectAuthError,
+   selectCurrentUser,
   clearError,
 } from "../../store/auth/authSlice";
 import toast from "react-hot-toast";
@@ -20,6 +21,10 @@ export default function AdminLoginForm() {
 
   const status = useAppSelector(selectAuthStatus);
   const serverError = useAppSelector(selectAuthError);
+  const user =
+  useAppSelector(
+    selectCurrentUser
+  );
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,6 +35,20 @@ export default function AdminLoginForm() {
 
   const isSubmitting = status === "loading";
   const error = localError || serverError;
+  useEffect(() => {
+
+  if (!user) return;
+
+  if (user.role === "ADMIN") {
+
+    navigate(
+      ROUTES.ADMIN_DASHBOARD,
+      { replace: true }
+    );
+
+  }
+
+}, [user, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -58,7 +77,7 @@ export default function AdminLoginForm() {
 
     if (loginAdmin.fulfilled.match(result)) {
       toast.success("Admin access granted");
-      navigate(ROUTES.ADMIN_DASHBOARD);
+      navigate(ROUTES.ADMIN_DASHBOARD,{replace:true});
     } else if (loginAdmin.rejected.match(result)) {
       toast.error(result.payload as string || "Admin login failed");
       dispatch(clearError());

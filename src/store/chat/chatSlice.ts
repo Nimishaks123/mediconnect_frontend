@@ -27,6 +27,7 @@ export interface Message {
 interface ChatState {
   messages: Message[];
   activeConversationId: string | null;
+  activeRecipientId: string | null;
   typingUsers: Record<string, boolean>; // conversationId -> isTyping
   recipientOnline: boolean;
   loading: boolean;
@@ -36,6 +37,7 @@ interface ChatState {
 const initialState: ChatState = {
   messages: [],
   activeConversationId: null,
+  activeRecipientId: null,
   typingUsers: {},
   recipientOnline: false,
   loading: false,
@@ -46,6 +48,15 @@ export const fetchMessages = createAsyncThunk(
   "chat/fetchMessages",
   async (conversationId: string) => {
     const response = await api.get(`/chat/messages/${conversationId}`);
+
+    console.log(
+      "FETCH MESSAGES RESPONSE",
+      response.data
+    );
+    console.log(
+  "FETCHING:",
+  conversationId
+);
     return { conversationId, messages: response.data };
   }
 );
@@ -99,6 +110,12 @@ const chatSlice = createSlice({
         state.recipientOnline = false;
       }
     },
+    setActiveRecipient: (
+  state,
+  action: PayloadAction<string | null>
+) => {
+  state.activeRecipientId = action.payload;
+},
     addMessage: (state, action: PayloadAction<Message>) => {
       const msg = action.payload;
       if (state.activeConversationId === msg.conversationId) {
@@ -129,6 +146,11 @@ const chatSlice = createSlice({
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loading = false;
+        console.log(
+      "REDUX RECEIVED:",
+      action.payload.messages.length
+    );
+
         state.messages = action.payload.messages;
         state.activeConversationId = action.payload.conversationId;
       })
@@ -150,6 +172,7 @@ export const {
   addMessage, 
   clearMessages, 
   setActiveConversation, 
+    setActiveRecipient,
   setUserTyping, 
   setRecipientOnline, 
   updateMessageStatus 

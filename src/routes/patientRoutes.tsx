@@ -16,8 +16,11 @@ import PatientProfilePage from "../pages/PatientProfilePage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentCancelledPage from "../pages/PaymentCancelledPage";
 import DoctorDetailsPage from "../pages/DoctorDetailsPage";
+import WalletTopupSuccessPage from "../pages/WalletTopupSuccessPage";
+import WalletTopupCancelPage from "../pages/WalletTopupCancelPage";
 
 import { ROUTES } from "../constants/routes";
+import PrescriptionPage from "../pages/doctor/PrescriptionPage";
 
 export const PatientRoutes = () => (
   <Route element={<ProtectedRoute allowedRoles={[ROLES.PATIENT]} />}>
@@ -33,6 +36,16 @@ export const PatientRoutes = () => (
       <Route path={ROUTES.PATIENT_PROFILE} element={<PatientProfilePage />} />
       <Route path="/payment-success/:appointmentId" element={<PaymentSuccessPage />} />
       <Route path="/payment-cancelled" element={<PaymentCancelledPage />} />
+      <Route path="/prescriptions/:appointmentId" element={<PrescriptionPage/>}/>
+      <Route
+  path="/wallet/success"
+  element={<WalletTopupSuccessPage />}
+/>
+
+<Route
+  path="/wallet/cancel"
+  element={<WalletTopupCancelPage />}
+/>
       <Route
   path="/doctors/:doctorId"
   element={<DoctorDetailsPage />}

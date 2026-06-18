@@ -19,6 +19,7 @@ import {
   CameraIcon,
 } from "@heroicons/react/24/outline";
 import { uploadApi } from "../api/uploadApi";
+import ChangePasswordSection from "../components/profile/ChangePasswordSection";
 
 const PatientProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -468,6 +469,7 @@ const PatientProfilePage: React.FC = () => {
           <p className="text-sm font-medium">{error}</p>
         </div>
       )}
+      <ChangePasswordSection />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import { getMyAppointments } from "../../api/patientAppointments";
 
 export default function ChatPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
+
   const navigate = useNavigate();
   const user = useAppSelector(selectCurrentUser);
   const [recipient, setRecipient] = useState<{ id: string; name: string } | null>(null);
@@ -20,6 +21,15 @@ export default function ChatPage() {
   useEffect(() => {
     const fetchInfo = async () => {
       if (!conversationId || !user) return;
+        console.log(
+    "CURRENT ROUTE ID:",
+    conversationId
+  );
+
+  console.log(
+    "CURRENT USER:",
+    user.role
+  );
       
       try {
         setLoading(true);
@@ -30,7 +40,24 @@ export default function ChatPage() {
           // The patient API returns { success: true, data: [...] }
           const appList = apps?.data || apps || [];
           foundApp = appList.find((a: any) => a.id === conversationId);
-          
+            console.log(
+    "Route conversationId:",
+    conversationId
+  );
+
+  console.log(
+    "Found appointment:",
+    foundApp
+  );
+  console.log(
+  "Appointment ID:",
+  foundApp?.id
+);
+
+console.log(
+  "Appointment appointmentId:",
+  foundApp?.appointmentId
+);
           if (foundApp && foundApp.doctor) {
             setRecipient({
               id: foundApp.doctor.userId,
@@ -49,6 +76,15 @@ export default function ChatPage() {
           
           console.log("[ChatPage] All Appointments for Doctor:", allApps);
           foundApp = allApps.find((a: any) => a.appointmentId === conversationId);
+          console.log(
+  "Route conversationId:",
+  conversationId
+);
+
+console.log(
+  "Found appointment:",
+  foundApp
+);
           if (foundApp) {
              setRecipient({
                 id: foundApp.patientId,

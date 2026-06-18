@@ -27,3 +27,33 @@ export const payWithWallet=async(appointmentId:string)=>{
   const res=await api.post(API_ENDPOINTS.PATIENT_APPOINTMENTS.PAY_WITH_WALLET,{appointmentId});
   return res.data;
 };
+export const topupWallet = async (
+  amount: number
+) => {
+  
+  console.log(
+    "TOPUP REQUEST:",
+    { amount }
+  );
+
+  const res =
+    await api.post(
+      API_ENDPOINTS.PATIENT_WALLET.TOPUP,
+      { amount }
+    );
+
+  return res.data;
+};
+export const getWalletTransactions =
+  async (
+    page = 1,
+    limit = 3
+  ) => {
+
+    const res =
+      await api.get(
+        `${API_ENDPOINTS.PATIENT_WALLET.TRANSACTIONS}?page=${page}&limit=${limit}`
+      );
+
+    return res.data.data;
+  };

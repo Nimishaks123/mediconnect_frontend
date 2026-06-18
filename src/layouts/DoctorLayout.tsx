@@ -4,12 +4,13 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchDoctorProfile } from "../store/doctor/doctorSlice";
 import Sidebar from "../components/doctor/dashboard/Sidebar";
 import Topbar from "../components/doctor/dashboard/Topbar";
-
+import { useBlockListener } from "../hooks/useBlockListener";
 export default function DoctorLayout() {
+  useBlockListener();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const isInitialMount = useRef(true);
-  const { profile, loading } = useAppSelector(state => state.doctor);
+  //const { profile, loading } = useAppSelector(state => state.doctor);
 
   useEffect(() => {
     if (isInitialMount.current) {

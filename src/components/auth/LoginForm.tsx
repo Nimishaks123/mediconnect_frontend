@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -31,6 +31,48 @@ export default function LoginForm() {
 
   const isSubmitting = status === "loading";
   const error = localError || serverError;
+  const currentUser =
+  useAppSelector(
+    (state)=>state.auth.user
+  );
+
+useEffect(()=>{
+
+   if(!currentUser)
+      return;
+
+   if(
+     currentUser.role ===
+     "PATIENT"
+   ){
+
+      navigate(
+         ROUTES.USER_DASHBOARD,
+         {replace:true}
+      );
+
+   } else if(
+      currentUser.role ===
+      "DOCTOR"
+   ){
+
+      navigate(
+        ROUTES.DOCTOR_DASHBOARD,
+        {replace:true}
+      );
+
+   } else {
+
+      navigate(
+        ROUTES.ADMIN_DASHBOARD,
+        {replace:true}
+      );
+   }
+
+},[
+   currentUser,
+   navigate
+]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
@@ -63,17 +105,17 @@ export default function LoginForm() {
     showSuccess("Welcome back, " + user.name + "!");
 
     if (user.role === "PATIENT") {
-      navigate(ROUTES.USER_DASHBOARD);
+      navigate(ROUTES.USER_DASHBOARD,{replace:true});
     } else if (user.role === "DOCTOR") {
       if (user.onboardingStatus === "APPROVED") {
-        navigate(ROUTES.DOCTOR_DASHBOARD);
+        navigate(ROUTES.DOCTOR_DASHBOARD,{replace:true});
       } else {
-        navigate(ROUTES.DOCTOR_ONBOARDING);
+        navigate(ROUTES.DOCTOR_ONBOARDING,{replace:true});
       }
     } else if (user.role === "ADMIN") {
-      navigate(ROUTES.ADMIN_DASHBOARD);
+      navigate(ROUTES.ADMIN_DASHBOARD,{replace:true});
     } else {
-      navigate(ROUTES.HOME);
+      navigate(ROUTES.HOME,{replace:true});
     }
   } else if (loginUser.rejected.match(result)) {
      showError(result.payload as string || "Login failed");

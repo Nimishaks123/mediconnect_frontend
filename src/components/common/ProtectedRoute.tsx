@@ -21,7 +21,11 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
       </div>
     );
   }
-
+console.log("PROTECTED ROUTE", {
+  user,
+  accessToken,
+  isInitialized,
+});
   // 2. If no token,  not logged in
   if (!accessToken) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;

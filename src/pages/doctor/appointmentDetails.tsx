@@ -3,9 +3,10 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getDoctorAppointments, cancelDoctorAppointment, rescheduleDoctorAppointment } from "../../api/appointments";
 import { api } from "../../api/api";
 import { toast } from "react-hot-toast";
-
+import{getPrescription } from "../../api/prescription";
 type AppointmentForDoctor = {
   appointmentId: string;
+  bookingId:string;
   patientId: string;
   patientName: string;
   date: string;
@@ -30,7 +31,8 @@ export default function DoctorAppointmentDetailsPage() {
   const [appointment, setAppointment] = useState<AppointmentForDoctor | null>(
     location.state?.app || null
   );
-
+const [prescriptionExists, setPrescriptionExists] =
+  useState(false);
   const [loading, setLoading] = useState(!appointment);
   const [rescheduling, setRescheduling] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -42,7 +44,28 @@ export default function DoctorAppointmentDetailsPage() {
       loadAppointment();
     }
   }, []);
+ useEffect(() => {
+  const checkPrescription = async () => {
+    if (!appointment) return;
 
+    try {
+      await getPrescription(
+        appointment.appointmentId
+      );
+
+      setPrescriptionExists(true);
+    } catch {
+      setPrescriptionExists(false);
+    }
+  };
+
+  if (
+    appointment &&
+    appointment.status === "COMPLETED"
+  ) {
+    checkPrescription();
+  }
+}, [appointment]);
   const loadAppointment = async () => {
     try {
       setLoading(true);
@@ -71,6 +94,7 @@ export default function DoctorAppointmentDetailsPage() {
     try {
       const slotsResponse = await api.get(`/doctor/schedules/slots?from=${date}&to=${date}`);
       const rawData = Array.isArray(slotsResponse.data) ? slotsResponse.data : slotsResponse.data.data || [];
+      console.log("SLOTS FROM API", rawData);
 
       const freeSlots = rawData.filter((s: any) => !s.isBooked).map((s: any) => ({
         _id: s._id || `${s.date}_${s.startTime}`,
@@ -186,7 +210,8 @@ export default function DoctorAppointmentDetailsPage() {
                 {appointment.status}
               </span>
               <span className="text-gray-400 font-bold text-sm">
-                ID: #{appointment.appointmentId.slice(-8).toUpperCase()}
+                {/* ID: #{appointment.appointmentId.slice(-8).toUpperCase()} */}
+                #{appointment.bookingId}
               </span>
             </div>
           </div>
@@ -221,22 +246,62 @@ export default function DoctorAppointmentDetailsPage() {
           </button>
         </div>
 
-        {appointment.status !== 'CANCELLED' && appointment.status !== 'COMPLETED' && (
-          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-            <button
-              onClick={handleCancel}
-              className="flex-1 px-6 py-4 border-2 border-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all active:scale-95 text-lg"
-            >
-              Cancel Appointment
-            </button>
-            <button
-              onClick={handleRescheduleClick}
-              className="flex-1 px-6 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95 text-lg"
-            >
-              Reschedule
-            </button>
-          </div>
-        )}
+     {/* Action Buttons */}
+
+<>
+  {appointment.status !== "CANCELLED" &&
+    appointment.status !== "COMPLETED" && (
+      <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+        <button
+          onClick={handleCancel}
+          className="flex-1 px-6 py-4 border-2 border-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-50 hover:border-red-100 transition-all active:scale-95 text-lg"
+        >
+          Cancel Appointment
+        </button>
+
+        <button
+          onClick={handleRescheduleClick}
+          className="flex-1 px-6 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 active:scale-95 text-lg"
+        >
+          Reschedule
+        </button>
+      </div>
+    )}
+
+{appointment.status === "COMPLETED" &&
+ !prescriptionExists && (
+  <div className="pt-6 border-t border-gray-100">
+    <button
+      onClick={() =>
+        navigate(
+          `/doctor/prescriptions/create/${appointment.appointmentId}`,
+          {
+            state: { appointment },
+          }
+        )
+      }
+      className="w-full px-6 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700"
+    >
+      Create Prescription
+    </button>
+  </div>
+)}
+{appointment.status === "COMPLETED" &&
+ prescriptionExists && (
+  <div className="pt-6 border-t border-gray-100">
+    <button
+      onClick={() =>
+        navigate(
+          `/doctor/prescription/${appointment.appointmentId}`
+        )
+      }
+      className="w-full px-6 py-4 bg-sky-600 text-white font-bold rounded-2xl hover:bg-sky-700"
+    >
+      View Prescription
+    </button>
+  </div>
+)}
+</>
 
         {rescheduling && (
           <div className="mt-8 border-t border-gray-100 pt-8 animate-in slide-in-from-top duration-500">
@@ -285,7 +350,7 @@ export default function DoctorAppointmentDetailsPage() {
             </div>
           </div>
         )}
-      </div>
+       </div>
     </div>
   );
 }
