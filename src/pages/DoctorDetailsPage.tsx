@@ -28,6 +28,7 @@ import {
   CalendarDays,
   Video,
 } from "lucide-react";
+import { getDoctorReviews } from "../api/review";
 
 export default function DoctorDetailsPage() {
 
@@ -42,6 +43,11 @@ export default function DoctorDetailsPage() {
 
   const [loading, setLoading] =
     useState(true);
+    const [reviewsData, setReviewsData] = useState({
+  averageRating: 0,
+  totalReviews: 0,
+  reviews: [],
+});
 
   useEffect(() => {
 
@@ -80,6 +86,27 @@ export default function DoctorDetailsPage() {
     fetchDoctor();
 
   }, [doctorId]);
+  useEffect(() => {
+  if (!doctorId) return;
+
+  const fetchReviews = async () => {
+    try {
+      const data =
+        await getDoctorReviews(
+          doctorId
+        );
+
+      setReviewsData(data);
+    } catch (error) {
+      console.error(
+        "Failed to load reviews",
+        error
+      );
+    }
+  };
+
+  fetchReviews();
+}, [doctorId]);
 
   // LOADING
   if (loading) {
@@ -151,24 +178,23 @@ export default function DoctorDetailsPage() {
 
                     <div className="flex items-center gap-3 flex-wrap">
 
-                      <h1 className="text-4xl font-bold text-gray-900">
+  <h1 className="text-4xl font-bold text-gray-900">
+    {doctor.name || "Dr. Specialist"}
+  </h1>
 
-                        {
-                          doctor.name ||
-                          "Dr. Specialist"
-                        }
+  <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
 
-                      </h1>
+  <Star className="w-4 h-4 fill-yellow-500" />
 
-                      <div className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
+  {reviewsData.averageRating.toFixed(1)}
 
-                        <Star className="w-4 h-4 fill-yellow-500" />
+  <span className="text-xs ml-1">
+    ({reviewsData.totalReviews})
+  </span>
 
-                        4.9
+</div>
 
-                      </div>
-
-                    </div>
+</div>
 
                     <p className="text-sky-600 text-lg font-medium mt-2 capitalize">
 
@@ -287,6 +313,7 @@ export default function DoctorDetailsPage() {
                 </h2>
 
               </div>
+              
 
               <div className="flex items-start gap-3">
 
@@ -304,6 +331,58 @@ export default function DoctorDetailsPage() {
               </div>
 
             </div>
+            {/* PATIENT REVIEWS */}
+<div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+
+  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+    Patient Reviews
+  </h2>
+
+  {reviewsData.reviews.length === 0 ? (
+    <p className="text-gray-500">
+      No reviews yet
+    </p>
+  ) : (
+    <div className="space-y-6">
+      {reviewsData.reviews.map(
+        (review: any) => (
+          <div
+            key={review.reviewId}
+            className="border-b border-gray-100 pb-5"
+          >
+            <div className="flex justify-between items-start mb-2">
+
+              <div>
+                <p className="font-semibold text-gray-900">
+                  {review.patientName}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {new Date(
+                    review.createdAt
+                  ).toLocaleDateString()}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1 text-yellow-500">
+                <Star className="w-4 h-4 fill-yellow-500" />
+                <span className="font-semibold">
+                  {review.rating}/5
+                </span>
+              </div>
+
+            </div>
+
+            <p className="text-gray-700 leading-relaxed">
+              {review.comment}
+            </p>
+          </div>
+        )
+      )}
+    </div>
+  )}
+
+</div>
 
           </div>
 

@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyAppointments } from "../api/patientAppointments";
 import doctorPlaceholder from "../assets/default-doctor.jpeg";
-
+import ReviewModal from "../components/review/ReviewModal";
 type Appointment = {
   id: string;
   date: string; // YYYY-MM-DD
   startTime: string;
   endTime: string;
-  status: "CONFIRMED" | "PAYMENT_PENDING" | "CANCELLED" | "RESCHEDULED";
+  status: "CONFIRMED" | "PAYMENT_PENDING" | "CANCELLED" | "RESCHEDULED"| "COMPLETED";
   paymentStatus: "SUCCESS" | "PENDING" | "FAILED" | "REFUNDED";
   refundAmount: number;
   cancellationCharge: number;
@@ -26,6 +26,11 @@ export default function PatientAppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("upcoming");
+  const [selectedAppointmentId, setSelectedAppointmentId] =
+  useState<string | null>(null);
+
+const [showReviewModal, setShowReviewModal] =
+  useState(false);
   const navigate = useNavigate();
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -33,6 +38,9 @@ export default function PatientAppointmentsPage() {
   const fetchAppointments = () => {
     getMyAppointments()
       .then((data) => {
+        console.log(
+        "PATIENT APPOINTMENTS:",
+        data);
         setAppointments(data ?? []);
       })
       .catch(() => {
@@ -179,6 +187,19 @@ export default function PatientAppointmentsPage() {
                          💬 Chat
                        </button>
                     )}
+                    {appt.status === "COMPLETED" && (
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+
+      setSelectedAppointmentId(appt.id);
+      setShowReviewModal(true);
+    }}
+    className="w-full mt-2 px-4 py-2 bg-yellow-50 text-yellow-700 font-bold text-xs rounded-xl hover:bg-yellow-500 hover:text-white transition-all border border-yellow-100 shadow-sm"
+  >
+    ⭐ Write Review
+  </button>
+)}
                   </div>
 
                   <div className="flex flex-col items-end">
@@ -211,6 +232,19 @@ export default function PatientAppointmentsPage() {
           })
         )}
       </div>
+      {showReviewModal &&
+  selectedAppointmentId && (
+    <ReviewModal
+      appointmentId={selectedAppointmentId}
+      onClose={() =>
+        setShowReviewModal(false)
+      }
+      onSuccess={() => {
+        setShowReviewModal(false);
+        fetchAppointments();
+      }}
+    />
+)}
     </div>
   );
 }

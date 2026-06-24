@@ -21,6 +21,7 @@ import {
   DocumentArrowDownIcon,
   CameraIcon
 } from "@heroicons/react/24/outline";
+import { DoctorProfileSchema } from "../validation/doctorProfileSchema";
 
 export default function DoctorProfilePage() {
   const dispatch = useAppDispatch();
@@ -102,36 +103,32 @@ export default function DoctorProfilePage() {
     }
   };
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validations
-    if (editForm.aboutMe.length < 20) {
-      showError("About Me must be at least 20 characters");
-      return;
-    }
-    if (editForm.experience < 0 || editForm.experience > 60) {
-      showError("Experience must be between 0 and 60 years");
-      return;
-    }
-    if (editForm.consultationFee < 100 || editForm.consultationFee > 10000) {
-      showError("Fee must be between ₹100 and ₹10000");
-      return;
-    }
+  const handleUpdate = async () => {
+  const result = DoctorProfileSchema.safeParse(editForm);
 
-    setUpdating(true);
-    try {
-      await doctorOnboardingApi.updateBasicInfo(editForm);
-      showSuccess("Profile updated successfully");
-      setIsEditing(false);
-      dispatch(fetchDoctorProfile());
+  if (!result.success) {
+    showError(result.error.issues[0].message);
+    return;
+  }
 
-    } catch (err: any) {
-      showError(err.response?.data?.message || "Failed to update profile");
-    } finally {
-      setUpdating(false);
-    }
-  };
+  setUpdating(true);
+
+  try {
+    await doctorOnboardingApi.updateBasicInfo(result.data);
+
+    showSuccess("Profile updated successfully");
+    setIsEditing(false);
+
+    dispatch(fetchDoctorProfile());
+  } catch (err: any) {
+    showError(
+      err.response?.data?.message ||
+      "Failed to update profile"
+    );
+  } finally {
+    setUpdating(false);
+  }
+};
 
   if (loading) return (
     <div className="flex justify-center items-center min-h-[400px]">
@@ -244,7 +241,7 @@ export default function DoctorProfilePage() {
         {/* Content Section */}
         <div className="p-8">
           {isEditing ? (
-            <form onSubmit={handleUpdate} className="space-y-8 animate-in slide-in-from-top-4 duration-500">
+            <form  className="space-y-8 animate-in slide-in-from-top-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Editable Fields */}
                 <div className="space-y-6">
@@ -255,7 +252,6 @@ export default function DoctorProfilePage() {
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                       value={editForm.specialty}
                       onChange={e => setEditForm({...editForm, specialty: e.target.value})}
-                      required
                     />
                   </div>
                   <div>
@@ -314,7 +310,8 @@ export default function DoctorProfilePage() {
 
               <div className="flex gap-4 pt-4">
                 <button 
-                  type="submit"
+                  type="button"
+                  onClick={handleUpdate}
                   disabled={updating}
                   className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-100 transition-all disabled:opacity-50"
                 >

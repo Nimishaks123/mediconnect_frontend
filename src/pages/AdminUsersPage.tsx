@@ -23,8 +23,7 @@ export default function AdminUsersPage() {
   type: "BLOCK" | "UNBLOCK";
 } | null>(null);
 
-
-  /* -------------------- DEBOUNCE SEARCH -------------------- */
+//debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -33,7 +32,7 @@ export default function AdminUsersPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  /* -------------------- FETCH USERS -------------------- */
+ //fetch users
   useEffect(() => {
     dispatch(
       fetchAllUsers({
@@ -47,8 +46,6 @@ export default function AdminUsersPage() {
   }, [dispatch, page, limit, debouncedSearch, role, status]);
 
   const totalPages = Math.ceil(total / limit);
-
-  /* -------------------- UI -------------------- */
   return (
     <div className="bg-gray-50">
 
@@ -150,29 +147,6 @@ export default function AdminUsersPage() {
                       )}
                     </td>
 
-                    {/* <td className="p-4 text-center">
-                      {u.blocked ? (
-                        <button
-                          onClick={() => {
-                            dispatch(unblockUser(u.id));
-                            toast.success("User unblocked");
-                          }}
-                          className="px-4 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                        >
-                          Unblock
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            dispatch(blockUser(u.id));
-                            toast.success("User blocked");
-                          }}
-                          className="px-4 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                        >
-                          Block
-                        </button>
-                      )}
-                    </td> */}
                     <td className="p-4 text-center">
   {u.blocked ? (
     <button
@@ -249,7 +223,7 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
-      {/* ================= CONFIRMATION MODAL ================= */}
+    //modal confirmation
 {confirmAction && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
     <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">

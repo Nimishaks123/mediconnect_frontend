@@ -12,7 +12,7 @@ import DoctorAppointmentDetailsPage from "../pages/doctor/appointmentDetails";
 import DoctorProfilePage from "../pages/DoctorProfilePage";
 import PendingApprovalPage from "../pages/doctor/PendingApprovalPage";
 import RejectedPage from "../pages/doctor/RejectedPage";
-
+import DoctorReviewsPage from "../pages/doctor/DoctorReviewsPage"
 export const DoctorRoutes = () => (
   <Route element={<ProtectedRoute allowedRoles={[ROLES.DOCTOR]} />}>
     {/* onboarding – no layout */}
@@ -28,6 +28,10 @@ export const DoctorRoutes = () => (
       <Route path="slots" element={<DoctorSlotsPage />} />
       <Route path="appointments" element={<DoctorAppointmentsPage />} />
       <Route path="appointments/:id" element={<DoctorAppointmentDetailsPage />} />
+      <Route
+  path="/doctor/reviews"
+  element={<DoctorReviewsPage />}
+/>
     </Route>
   </Route>
 );

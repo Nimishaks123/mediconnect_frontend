@@ -5,13 +5,7 @@ import InfoCard from "../components/doctor/dashboard/InfoCard";
 export default function DoctorDashboard() {
   return (
     <>
-    {/* // <div className="flex bg-gray-100 min-h-screen">
-    //   <Sidebar />
-
-    //   <main className="flex-1 p-8">
-    //     <Topbar /> */}
-
-        {/* Stats */}
+  {/* Stats */}
         <div className="grid grid-cols-3 gap-6 mb-8">
           <StatCard label="Total Revenue" value="850000" icon="💰" />
           <StatCard label="New Patients" value={76} icon="🧑‍⚕️" />
@@ -30,8 +24,7 @@ export default function DoctorDashboard() {
           </div>
           <InfoCard />
         </div>
-      {/* </main>
-    </div> */}
+  
     </>
   );
 }

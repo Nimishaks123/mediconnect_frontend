@@ -143,5 +143,10 @@ PATIENT_WALLET: {
 UPLOADS: {
   GET_SIGNATURE: "/upload/signature",
 },
+REVIEWS:{
+  CREATE:"/reviews",
+  GET_DOCTOR_REVIEWS:(doctorId:string)=>
+    `/reviews/doctor/${doctorId}`,
+  },
+}
 
-};

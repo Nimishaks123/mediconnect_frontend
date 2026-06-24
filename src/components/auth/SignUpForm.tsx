@@ -6,8 +6,6 @@ import { ROUTES } from "../../constants/routes";
 import { showError, showSuccess } from "../../utils/toastUtils";
 import { z } from "zod";
 
-// ------------------- ZOD VALIDATION SCHEMA -------------------
-
 const SignupSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
@@ -30,8 +28,6 @@ const SignupSchema = z
 
 type SignupFormData = z.infer<typeof SignupSchema>;
 type SignupErrors = Partial<Record<keyof SignupFormData, string>>;
-
-// ------------------------------------------------------------------
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -97,6 +93,7 @@ export default function SignUpForm() {
       };
 
       const response = await api.post("/auth/signup", payload);
+      console.log("signup data",response.status,response.data);
 
       showSuccess(response.data.message || "Signup successful!");
 
@@ -171,7 +168,7 @@ export default function SignUpForm() {
         <div>
           <label className="block text-gray-700 font-medium mb-2">Email</label>
           <input
-            type="text" // IMPORTANT: disables browser validation
+            type="text" 
             name="email"
             autoComplete="off"
             value={formData.email}

@@ -56,6 +56,9 @@ export default function Sidebar() {
   <NavLink to="/doctor/wallet" className={linkClass}>
     💳 Wallet
   </NavLink>
+  <NavLink to="/doctor/reviews" className={linkClass}>
+  ⭐ Reviews
+</NavLink>
 
   <NavLink to="/doctor/profile" className={linkClass}>
     👤 Profile

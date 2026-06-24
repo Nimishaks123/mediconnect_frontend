@@ -7,7 +7,7 @@ import {
   bookAppointmentThunk,
 } from "./appointmentThunks";
 
-/* ================= TYPES ================= */
+//types
 interface AppointmentState {
   doctors: Doctor[];
   availability: DoctorAvailability[];
@@ -22,8 +22,7 @@ const initialState: AppointmentState = {
   error: null,
   bookingSuccess: false,
 };
-
-/* ================= SLICE ================= */
+//slice
 
 const appointmentSlice = createSlice({
   name: "appointments",
@@ -36,7 +35,7 @@ const appointmentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      /* -------- VERIFIED DOCTORS -------- */
+    //verified doctors
       .addCase(fetchVerifiedDoctors.pending, (state) => {
         state.loading = true;
       })
@@ -49,7 +48,7 @@ const appointmentSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      /* -------- AVAILABILITY -------- */
+    //availability
       .addCase(fetchDoctorAvailability.pending, (state) => {
         state.loading = true;
       })
@@ -61,8 +60,7 @@ const appointmentSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-
-      /* -------- BOOK APPOINTMENT -------- */
+    //book appointment
       .addCase(bookAppointmentThunk.pending, (state) => {
         state.loading = true;
         state.bookingSuccess = false;
