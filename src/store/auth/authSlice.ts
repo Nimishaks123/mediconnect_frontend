@@ -11,6 +11,7 @@ import type { AxiosError } from "axios";
 import { authService } from "../../services/authService";
 import { adminAuthApi } from "../../api/adminAuthApi";
 import type { RootState } from "../index";
+import { authApi } from "../../api/authApi";
 
 export type Role = "PATIENT" | "DOCTOR" | "ADMIN";
 
@@ -91,6 +92,57 @@ export const loginAdmin = createAsyncThunk<
     return rejectWithValue(msg);
   }
 });
+// export const changePassword=createAsyncThunk<{success:boolean;message:string},
+// {currentPassword:string;newPassword:string},
+// {rejectValue:string;}>("/auth/changePassword",async({currentPassword,newPassword},{rejectWithValue})=>{
+//   try{
+//     const response=await authApi.changePassword(currentPassword,newPassword);
+//     return response.data;
+
+//   }catch(error){
+//     const axiosErr=error as AxiosError<{
+//       message:string;
+//     }>;
+//     return rejectWithValue(
+//       axiosErr.response?.data?.message||"Failed to change password"
+//     );
+//   }
+// })
+export const changePassword = createAsyncThunk<
+  { success: boolean; message: string },
+  {
+    currentPassword: string;
+    newPassword: string;
+  },
+  {
+    rejectValue: string;
+  }
+>(
+  "auth/changePassword",
+  async (
+    { currentPassword, newPassword },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await authApi.changePassword(
+        currentPassword,
+        newPassword
+      );
+
+      return response.data;
+    } catch (error) {
+      const axiosErr = error as AxiosError<{
+        message: string;
+      }>;
+
+      return rejectWithValue(
+        axiosErr.response?.data?.message ??
+          "Failed to change password"
+      );
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -104,6 +156,7 @@ const authSlice = createSlice({
       localStorage.setItem("accessToken", action.payload);
     },
     logout: (state) => {
+       console.log("LOGOUT REDUCER RUNNING");
       state.user = null;
       state.accessToken = null;
       state.status = "idle";
@@ -209,7 +262,20 @@ const authSlice = createSlice({
       .addCase(loginAdmin.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload ?? "Admin login failed";
-      });
+      })
+      .addCase(changePassword.pending,(state)=>{
+        state.status="loading";
+        state.error=null;
+
+      })
+      .addCase(changePassword.fulfilled,(state)=>{
+        state.status="succeeded";
+        state.error=null;
+      })
+      .addCase(changePassword.rejected,(state,action)=>{
+        state.status="failed";
+        state.error=action.payload??"failed to change password";
+      })
   },
 });
 

@@ -17,6 +17,7 @@ import {
   sendMessage,
   clearMessages,
   setActiveConversation,
+   setActiveRecipient,
   markConversationAsRead
 } from "../../store/chat/chatSlice";
 
@@ -31,6 +32,8 @@ import {
   CheckBadgeIcon,
   VideoCameraIcon
 } from "@heroicons/react/24/solid";
+import EmojiPicker from "emoji-picker-react";
+import { FaceSmileIcon } from "@heroicons/react/24/outline";
 
 import { socketService }
 from "../../services/socketService";
@@ -109,6 +112,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   const [content, setContent] =
     useState("");
+    const [showEmojiPicker, setShowEmojiPicker] =
+  useState(false);
 
   const [selectedFile, setSelectedFile] =
     useState<File | null>(null);
@@ -138,6 +143,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     };
 
   useEffect(() => {
+      console.log(
+    "ChatBox conversationId:",
+    conversationId
+  );
+
 
     if (conversationId) {
 
@@ -146,6 +156,17 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           conversationId
         )
       );
+        dispatch(
+    setActiveRecipient(receiverId)
+  );
+  socketService
+  .getSocket()
+  ?.emit(
+    "check_user_status",
+    {
+      userId: receiverId
+    }
+  );
 
       dispatch(
         clearMessages()
@@ -248,6 +269,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
         }, 2000);
     };
+    const handleEmojiClick = (
+  emojiData: any
+) => {
+
+  setContent(
+    (prev) => prev + emojiData.emoji
+  );
+
+  setShowEmojiPicker(false);
+};
 
   const handleFileSelect =
     (
@@ -667,7 +698,7 @@ const res =
 
           {/* INPUT */}
 
-          <input
+          {/* <input
             type="text"
             value={content}
             onChange={
@@ -675,7 +706,42 @@ const res =
             }
             placeholder="Secure message..."
             className="flex-1 bg-transparent px-4 py-3 outline-none text-sm font-bold text-gray-700"
-          />
+          /> */}
+          <div className="relative flex-1 flex items-center">
+
+  <button
+    type="button"
+    onClick={() =>
+      setShowEmojiPicker(
+        !showEmojiPicker
+      )
+    }
+    className="mr-2 text-gray-500 hover:text-yellow-500"
+  >
+    <FaceSmileIcon className="w-6 h-6" />
+  </button>
+
+  {showEmojiPicker && (
+    <div className="absolute bottom-14 left-0 z-50">
+      <EmojiPicker
+        onEmojiClick={
+          handleEmojiClick
+        }
+      />
+    </div>
+  )}
+
+  <input
+    type="text"
+    value={content}
+    onChange={
+      handleInputChange
+    }
+    placeholder="Secure message..."
+    className="flex-1 bg-transparent px-4 py-3 outline-none text-sm font-bold text-gray-700"
+  />
+
+</div>
 
           {/* SEND */}
 

@@ -32,5 +32,9 @@ export const authApi = {
   logout: () => 
     api.post(API_ENDPOINTS.AUTH.LOGOUT
     ),
+    changePassword:(currentPassword:string,newPassword:string)=>
+      api.patch(API_ENDPOINTS.AUTH.CHANGE_PASSWORD,{currentPassword,newPassword}),
+
+
 };
 

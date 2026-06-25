@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 
 type AppointmentForDoctor = {
   appointmentId: string;
+  bookingId:string;
   patientName: string;
   patientEmail?: string;
   date: string;
@@ -110,34 +111,55 @@ export default function DoctorAppointmentsPage() {
             <p className="text-gray-500 mt-2">Your list is currently empty for this category.</p>
           </div>
         ) : (
-          appointmentsToShow.map((app) => (
-            <div 
-              key={app.appointmentId} 
-              onClick={() => navigate(`/doctor/appointments/${app.appointmentId}`, { state: { app } })}
-              className="group relative bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 overflow-hidden cursor-pointer"
+          appointmentsToShow.map((app) => {
+  console.log(
+    "DOCTOR APPOINTMENT:",
+    app
+  );
+
+  return (
+    <div
+      key={app.appointmentId}
+      onClick={() =>
+        navigate(
+          `/doctor/appointments/${app.appointmentId}`,
+          { state: { app } }
+        )
+      }
+      className="group relative bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 overflow-hidden cursor-pointer"
+    >
+      <div className="p-6 md:p-8 flex flex-col md:flex-row gap-8 items-start md:items-center">
+
+        {/* ID Badge & Status */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 font-bold text-xl ring-2 ring-sky-100 ring-offset-2">
+            {app.patientName.charAt(0)}
+          </div>
+
+          <div className="flex flex-col items-center gap-1">
+            <span
+              className={`text-[10px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${
+                app.status === "CONFIRMED"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : app.status === "CANCELLED"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-blue-100 text-blue-700"
+              }`}
             >
-              <div className="p-6 md:p-8 flex flex-col md:flex-row gap-8 items-start md:items-center">
-                
-                {/* ID Badge & Status */}
-                <div className="flex flex-col items-center gap-2">
-                   <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-sky-600 font-bold text-xl ring-2 ring-sky-100 ring-offset-2">
-                      {app.patientName.charAt(0)}
-                   </div>
-                   <div className="flex flex-col items-center gap-1">
-                      <span className={`text-[10px] uppercase font-black tracking-widest px-2 py-1 rounded-md ${
-                        app.status === 'CONFIRMED' ? 'bg-emerald-100 text-emerald-700' : 
-                        app.status === 'CANCELLED' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {app.status}
-                      </span>
-                      {app.videoCallAvailable && (
-                        <div className="flex items-center gap-1 text-[9px] text-sky-600 font-bold px-1.5 py-0.5 bg-sky-50 rounded-full border border-sky-100">
-                          <span className="w-1 h-1 bg-sky-500 rounded-full animate-pulse"></span>
-                          VIDEO READY
-                        </div>
-                      )}
-                   </div>
-                </div>
+              {app.status}
+            </span>
+
+            {app.videoCallAvailable && (
+              <div className="flex items-center gap-1 text-[9px] text-sky-600 font-bold px-1.5 py-0.5 bg-sky-50 rounded-full border border-sky-100">
+                <span className="w-1 h-1 bg-sky-500 rounded-full animate-pulse"></span>
+                VIDEO READY
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Rest of your card */}
+
 
                 {/* Patient Details */}
                 <div className="flex-1 space-y-1">
@@ -179,9 +201,12 @@ export default function DoctorAppointmentsPage() {
                       <span className="flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-full">
                          <span className="text-lg">🕒</span> {app.startTime} - {app.endTime}
                       </span>
-                      <span className="flex items-center gap-2 text-[10px] text-gray-400 font-bold">
-                        #{app.appointmentId.slice(-8).toUpperCase()}
-                      </span>
+                      {/* <span className="flex items-center gap-2 text-[10px] text-gray-400 font-bold">
+                      {app.bookingId}
+                      </span> */}
+                      <span className="px-3 py-1 bg-sky-100 text-sky-700 rounded-full font-bold">
+  Booking ID: {app.bookingId}
+</span>
                    </div>
                 </div>
 
@@ -192,9 +217,11 @@ export default function DoctorAppointmentsPage() {
                   </div>
                 </div>
               </div>
-          ))
+  );
+})
         )}
       </div>
     </div>
   );
 }
+

@@ -14,6 +14,7 @@ interface AppointmentState {
   loading: boolean;
   error: string | null;
   bookingSuccess: boolean;
+  total:number
 }
 const initialState: AppointmentState = {
   doctors: [],
@@ -21,6 +22,7 @@ const initialState: AppointmentState = {
   loading: false,
   error: null,
   bookingSuccess: false,
+  total:0
 };
 //slice
 
@@ -40,8 +42,10 @@ const appointmentSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchVerifiedDoctors.fulfilled, (state, action) => {
+
         state.loading = false;
-        state.doctors = action.payload;
+        state.doctors = action.payload.doctors;
+        state.total=action.payload.total;
       })
       .addCase(fetchVerifiedDoctors.rejected, (state, action) => {
         state.loading = false;

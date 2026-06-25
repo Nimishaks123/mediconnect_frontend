@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getMyAppointments, cancelAppointment, checkoutAppointment } from "../api/patientAppointments";
 import { toast } from "react-hot-toast";
 import doctorPlaceholder from "../assets/default-doctor.jpeg";
-
+import { getPrescription } from "../api/prescription";
 interface Appointment {
   _id: string;
   id: string;
@@ -33,7 +33,27 @@ export default function PatientAppointmentDetailsPage() {
   const [loading, setLoading] = useState(!appointment);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+const [prescriptionExists, setPrescriptionExists] =
+  useState(false);
+  useEffect(() => {
+  const checkPrescriptionExists = async () => {
+    if (!appointment?.id) return;
 
+    try {
+      await getPrescription(
+        appointment.id
+      );
+
+      setPrescriptionExists(true);
+    } catch {
+      setPrescriptionExists(false);
+    }
+  };
+
+  if (appointment?.status === "COMPLETED") {
+    checkPrescriptionExists();
+  }
+}, [appointment]);
   useEffect(() => {
     if (!appointment && id) {
       getMyAppointments()
@@ -276,21 +296,61 @@ export default function PatientAppointmentDetailsPage() {
             )}
 
             {canCancel && (
-              <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
-                 <h3 className="text-[10px] uppercase tracking-widest font-black text-red-500 mb-2">Cancellation Policy</h3>
-                 <ul className="text-xs text-red-700 space-y-1 mb-4 list-disc pl-4">
-                   <li>If cancelled before 24 hours → <strong>Full refund</strong></li>
-                   <li>If cancelled within 24 hours → <strong>No refund</strong></li>
-                 </ul>
-                 <button
-                  onClick={handleCancel}
-                  disabled={cancellingId !== null}
-                  className="w-full bg-white border-2 border-red-200 text-red-600 font-bold py-3 rounded-xl hover:bg-red-600 hover:text-white transition-colors flex items-center justify-center gap-2"
-                >
-                  {cancellingId ? "Cancelling..." : "Cancel Appointment"}
-                </button>
-              </div>
-            )}
+  <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
+    <h3 className="text-[10px] uppercase tracking-widest font-black text-red-500 mb-2">
+      Cancellation Policy
+    </h3>
+
+    <ul className="text-xs text-red-700 space-y-1 mb-4 list-disc pl-4">
+      <li>
+        If cancelled before 24 hours →
+        <strong> Full refund</strong>
+      </li>
+
+      <li>
+        If cancelled within 24 hours →
+        <strong> No refund</strong>
+      </li>
+    </ul>
+
+    <button
+      onClick={handleCancel}
+      disabled={cancellingId !== null}
+      className="w-full bg-white border-2 border-red-200 text-red-600 font-bold py-3 rounded-xl"
+    >
+      {cancellingId
+        ? "Cancelling..."
+        : "Cancel Appointment"}
+    </button>
+  </div>
+)}
+
+{/* Prescription Button */}
+{appointment.status === "COMPLETED" &&
+ prescriptionExists && (
+  <button
+    onClick={() =>
+      navigate(
+        `/prescriptions/${appointment.id}`
+      )
+    }
+    className="
+      w-full
+      mt-4
+      bg-sky-600
+      hover:bg-sky-700
+      text-white
+      font-bold
+      py-3
+      px-4
+      rounded-xl
+      transition-colors
+      shadow-md
+    "
+  >
+    View Prescription
+  </button>
+)}
           </div>
           
         </div>

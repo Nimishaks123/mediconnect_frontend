@@ -4,7 +4,7 @@ import { store } from "../store";
 import { addNotification } from "../store/notification/notificationSlice";
 import { addMessage, setUserTyping, setRecipientOnline, updateMessageStatus } from "../store/chat/chatSlice";
 import { setIncomingCall, setCallStatus } from "../store/call/callSlice";
-
+import { logout } from "../store/auth/authSlice";
 class SocketService {
   private socket: Socket | null = null;
 
@@ -36,15 +36,77 @@ class SocketService {
         conversationId: data.conversationId,
         status: "seen"
       }));
+      
     });
+this.socket.on(
+  "user_block_status_changed",
+  (data) => {
+
+    console.log(
+      "BLOCK EVENT RECEIVED",
+      data
+    );
+
+    const state =
+      store.getState();
+
+    const currentUser =
+      state.auth.user;
+
+    if (
+      currentUser?.id ===
+        data.userId &&
+      data.blocked
+    ) {
+
+      showError(
+        "Your account has been blocked by administrator"
+      );
+
+      store.dispatch(
+        logout()
+      );
+
+      this.disconnect();
+
+      setTimeout(() => {
+
+        window.location.href =
+          "/login";
+
+      }, 1500);
+    }
+  }
+);
+
 
     this.socket.on("user_status", (data) => {
+        console.log(
+    "USER STATUS EVENT:",
+    data
+  );
+
       const state = store.getState();
-      const activeRecipient = state.chat.messages[0]?.receiverId === data.userId || state.chat.messages[0]?.senderId === data.userId;
-      if (activeRecipient) {
-        store.dispatch(setRecipientOnline(data.status === "online"));
-      }
-    });
+    //   const activeRecipient = state.chat.messages[0]?.receiverId === data.userId || state.chat.messages[0]?.senderId === data.userId;
+    //   if (activeRecipient) {
+    //     store.dispatch(setRecipientOnline(data.status === "online"));
+    //   }
+    // });
+    const activeRecipientId =
+    state.chat.activeRecipientId;
+
+  if (
+    activeRecipientId ===
+    data.userId
+  ) {
+
+    store.dispatch(
+      setRecipientOnline(
+        data.status === "online"
+      )
+    );
+  }
+});
 
     this.socket.on("notification", (notification) => {
       store.dispatch(addNotification(notification));

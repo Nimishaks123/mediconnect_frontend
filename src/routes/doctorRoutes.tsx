@@ -2,7 +2,6 @@ import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import { ROLES } from "../constants/roles";
 import DoctorLayout from "../layouts/DoctorLayout";
-
 import DoctorOnboarding from "../pages/doctor-onboarding/DoctorOnboarding";
 import DoctorDashboard from "../pages/DoctorDashboard";
 import DoctorSchedulePage from "../pages/doctor/schedule";
@@ -13,6 +12,8 @@ import DoctorProfilePage from "../pages/DoctorProfilePage";
 import PendingApprovalPage from "../pages/doctor/PendingApprovalPage";
 import RejectedPage from "../pages/doctor/RejectedPage";
 import DoctorReviewsPage from "../pages/doctor/DoctorReviewsPage"
+import CreatePrescriptionPage from "../pages/doctor/CreatePrescriptionPage";
+import PrescriptionPage from "../pages/doctor/PrescriptionPage";
 export const DoctorRoutes = () => (
   <Route element={<ProtectedRoute allowedRoles={[ROLES.DOCTOR]} />}>
     {/* onboarding – no layout */}
@@ -28,9 +29,23 @@ export const DoctorRoutes = () => (
       <Route path="slots" element={<DoctorSlotsPage />} />
       <Route path="appointments" element={<DoctorAppointmentsPage />} />
       <Route path="appointments/:id" element={<DoctorAppointmentDetailsPage />} />
-      <Route
-  path="/doctor/reviews"
+     <Route
+  path="reviews"
   element={<DoctorReviewsPage />}
+/>
+
+<Route
+  path="prescriptions/create/:appointmentId"
+  element={<CreatePrescriptionPage />}
+/>
+
+{/* <Route
+  path="prescription/:appointmentId"
+  element={<PrescriptionPage />}
+/> */}
+<Route
+  path="/doctor/prescription/:appointmentId"
+  element={<PrescriptionPage />}
 />
     </Route>
   </Route>

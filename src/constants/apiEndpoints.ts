@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
     RESEND_OTP: "/auth/resend-otp",
     ME: "/auth/me",
     LOGOUT: "/auth/logout",
+    CHANGE_PASSWORD:"/auth/change-password",
   },
   ADMIN_AUTH: {
   BASE: "/admin/auth",
@@ -47,6 +48,7 @@ DOCTORS: {
   GET_BY_ID:(
     doctorId:string
   )=>`/doctor/public/${doctorId}`,
+   SPECIALTIES: "/doctor/specialties",
 },
 
 DOCTOR_SCHEDULES: {
@@ -130,6 +132,10 @@ PATIENT_WALLET: {
   BASE: "/patient/wallet",
 
   GET: "/patient/wallet",
+  TOPUP: "/patient/topup",
+  TRANSACTIONS:
+    "/patient/wallet/transactions",
+
 },
   ADMIN_DOCTORS: {
   BASE: "/admin/doctors",
@@ -148,5 +154,12 @@ REVIEWS:{
   GET_DOCTOR_REVIEWS:(doctorId:string)=>
     `/reviews/doctor/${doctorId}`,
   },
-}
 
+PRESCRIPTIONS: {
+  BASE: "/prescriptions",
+
+  GET_BY_APPOINTMENT: (
+    appointmentId: string
+  ) => `/prescriptions/${appointmentId}`,
+},
+}

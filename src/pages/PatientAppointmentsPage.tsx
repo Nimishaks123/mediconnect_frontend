@@ -5,10 +5,12 @@ import doctorPlaceholder from "../assets/default-doctor.jpeg";
 import ReviewModal from "../components/review/ReviewModal";
 type Appointment = {
   id: string;
+  bookingId:string;
   date: string; // YYYY-MM-DD
   startTime: string;
   endTime: string;
   status: "CONFIRMED" | "PAYMENT_PENDING" | "CANCELLED" | "RESCHEDULED"| "COMPLETED";
+  //status: "CONFIRMED" | "PAYMENT_PENDING" | "CANCELLED" | "RESCHEDULED"|"COMPLETED";
   paymentStatus: "SUCCESS" | "PENDING" | "FAILED" | "REFUNDED";
   refundAmount: number;
   cancellationCharge: number;
@@ -41,6 +43,10 @@ const [showReviewModal, setShowReviewModal] =
         console.log(
         "PATIENT APPOINTMENTS:",
         data);
+      console.log(
+        "PATIENT APPOINTMENTS:",
+        data
+      );
         setAppointments(data ?? []);
       })
       .catch(() => {
@@ -58,13 +64,20 @@ const [showReviewModal, setShowReviewModal] =
   const getFilteredAppointments = () => {
     switch (activeTab) {
       case "upcoming":
-        return appointments.filter(
-          (a) =>
-            (a.status === "CONFIRMED" || a.status === "RESCHEDULED") &&
-            a.date >= todayStr
-        );
-      case "past":
-        return appointments.filter((a) => a.date < todayStr && a.status !== "CANCELLED");
+  return appointments.filter(
+    (a) =>
+      a.status === "CONFIRMED" ||
+      a.status === "RESCHEDULED"
+  );
+       case "past":
+  return appointments.filter(
+    (a) =>
+      a.status === "COMPLETED" ||
+      (
+        a.date < todayStr &&
+        a.status !== "CANCELLED"
+      )
+  );
       case "cancelled":
         return appointments.filter((a) => a.status === "CANCELLED");
       case "pending":
@@ -119,6 +132,7 @@ const [showReviewModal, setShowReviewModal] =
           </div>
         ) : (
           filtered.map((appt) => {
+            console.log("appt",appt);
 
             return (
               <div
@@ -126,41 +140,73 @@ const [showReviewModal, setShowReviewModal] =
                 onClick={() => navigate(`/appointments/${appt.id}`, { state: { appointment: appt } })}
                 className="group cursor-pointer bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row sm:items-center gap-5"
               >
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="relative">
-                    <img
-                      src={appt.doctor?.profilePhoto ?? doctorPlaceholder}
-                      alt={appt.doctor?.name ?? "Doctor"}
-                      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-gray-50"
-                    />
-                    <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${appt.status === "CONFIRMED" || appt.status === "RESCHEDULED" ? "bg-green-500" :
-                        appt.status === "CANCELLED" ? "bg-red-500" : "bg-yellow-500"
-                      }`} />
-                  </div>
+ <div className="flex items-center gap-4 flex-1">
+  <div className="relative shrink-0">
+    <img
+      src={appt.doctor?.profilePhoto || doctorPlaceholder}
+      alt={appt.doctor?.name ?? "Doctor"}
+      onError={(e) => {
+        e.currentTarget.src = doctorPlaceholder;
+      }}
+      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-gray-50"
+    />
 
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-gray-900 text-lg group-hover:text-sky-600 transition-colors">
-                        Dr. {appt.doctor?.name ?? "Unavailable"}
-                      </h3>
-                      {appt.paymentStatus === "SUCCESS" && appt.date >= todayStr && appt.status !== "CANCELLED" && (
-                        <span className="text-xl" title="Video Call Available">📹</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-sky-600 font-medium bg-sky-50 inline-block px-2 py-0.5 rounded-md mt-1">
-                      {appt.doctor?.specialty ?? "Medical Specialist"}
-                    </p>
+    <div
+      className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+        appt.status === "CONFIRMED" || appt.status === "RESCHEDULED"
+          ? "bg-green-500"
+          : appt.status === "CANCELLED"
+          ? "bg-red-500"
+          : "bg-yellow-500"
+      }`}
+    />
+  </div>
 
-                    <div className="flex flex-wrap items-center gap-y-1 gap-x-4 mt-3 text-sm text-gray-500 font-medium">
-                      <span className="flex items-center gap-1.5">
-                        <span className="text-base text-gray-400 font-normal">Date:</span> {new Date(appt.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                      </span>
-                      <span className="flex items-center gap-1.5 border-l sm:pl-4 pl-0 border-gray-200">
-                        <span className="text-base text-gray-400 font-normal">Time:</span> {appt.startTime} – {appt.endTime}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+  <div className="flex-1">
+    <div className="flex items-center gap-2 flex-wrap">
+      <h3 className="font-bold text-gray-900 text-lg group-hover:text-sky-600 transition-colors">
+        Dr. {appt.doctor?.name ?? "Unavailable"}
+      </h3>
+
+      <span className="px-2 py-1 text-xs font-semibold bg-sky-50 text-sky-700 rounded-lg border border-sky-100">
+        #{appt.bookingId}
+      </span>
+
+      {appt.paymentStatus === "SUCCESS" &&
+        appt.date >= todayStr &&
+        appt.status !== "CANCELLED" && (
+          <span className="text-xl" title="Video Call Available">
+            📹
+          </span>
+        )}
+    </div>
+
+    <p className="text-sm text-sky-600 font-medium bg-sky-50 inline-block px-2 py-0.5 rounded-md mt-1">
+      {appt.doctor?.specialty ?? "Medical Specialist"}
+    </p>
+
+    <div className="flex flex-wrap items-center gap-y-1 gap-x-4 mt-3 text-sm text-gray-500 font-medium">
+      <span className="flex items-center gap-1.5">
+        <span className="text-base text-gray-400 font-normal">
+          Date:
+        </span>
+        {new Date(appt.date).toLocaleDateString(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
+      </span>
+
+      <span className="flex items-center gap-1.5 border-l sm:pl-4 pl-0 border-gray-200">
+        <span className="text-base text-gray-400 font-normal">
+          Time:
+        </span>
+        {appt.startTime} – {appt.endTime}
+      </span>
+    </div>
+  </div>
+</div>
 
                 <div className="flex sm:flex-col items-center sm:items-end justify-between gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 border-gray-100 min-w-[140px]">
                   <div className="flex flex-col items-end gap-2">
@@ -180,6 +226,10 @@ const [showReviewModal, setShowReviewModal] =
                        <button
                          onClick={(e) => {
                            e.stopPropagation();
+                             console.log(
+    "CHAT BUTTON APPOINTMENT:",
+    appt
+  );
                            navigate(`/chat/${appt.id}`);
                          }}
                          className="w-full mt-2 px-4 py-2 bg-sky-50 text-sky-600 font-bold text-xs rounded-xl hover:bg-sky-600 hover:text-white transition-all flex items-center justify-center gap-2 border border-sky-100 shadow-sm"
