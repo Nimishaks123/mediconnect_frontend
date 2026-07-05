@@ -6,13 +6,6 @@ export type Appointment = {
   status: "CONFIRMED" | "PAYMENT_PENDING" | "CANCELLED";
   createdAt: string;
 
-  // doctor: {
-  //   id: string;
-  //   name: string;
-  //   specialty?: string;
-  //   profilePhoto?: string | null;
-  // } | null;
-
 doctor: {
   id: string;
   name: string;

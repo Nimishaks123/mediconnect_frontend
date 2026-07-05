@@ -1,71 +1,3 @@
-// import { useState } from "react";
-// import { useAppDispatch, useAppSelector } from "../../store/hooks";
-// import { resetPassword } from "../../store/auth/forgotPasswordSlice";
-// import { useLocation, useNavigate } from "react-router-dom";
-// import toast from "react-hot-toast";
-// export default function ResetPasswordForm() {
-//   const [password, setPassword] = useState("");
-//   const [confirm, setConfirm] = useState("");
-
-//   const dispatch = useAppDispatch();
-//   const navigate = useNavigate();
-//   const location = useLocation();
-
-//   const email = location.state?.email;
-//   const { loading, error } = useAppSelector((state) => state.forgotPassword);
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-  
-//     if (password !== confirm) {
-//   toast.error("Passwords do not match");
-//       return;
-//     }
-  
-//     try {
-//       await dispatch(
-//         resetPassword({ email, newPassword: password })
-//       ).unwrap();
-  
-//       navigate("/login");
-//     } catch (err) {
-//       console.error("Password reset failed:", err);
-//     }
-//   };
-  
-
-//   return (
-//     <form onSubmit={handleSubmit} className="space-y-4">
-//       <input
-//         type="password"
-//         placeholder="New Password"
-//         className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-//         value={password}
-//         onChange={(e) => setPassword(e.target.value)}
-//         required
-//       />
-
-//       <input
-//         type="password"
-//         placeholder="Confirm Password"
-//         className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-//         value={confirm}
-//         onChange={(e) => setConfirm(e.target.value)}
-//         required
-//       />
-
-//       {error && <p className="text-red-500 text-sm bg-red-50 p-2 rounded">{error}</p>}
-
-//       <button
-//         type="submit"
-//         className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700"
-//         disabled={loading}
-//       >
-//         {loading ? "Resetting..." : "Reset Password"}
-//       </button>
-//     </form>
-//   );
-// }
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { resetPassword } from "../../store/auth/forgotPasswordSlice";
@@ -87,7 +19,6 @@ export default function ResetPasswordForm() {
     (state) => state.forgotPassword
   );
 
-  // 🚨 Redirect if email missing (page refresh case)
   useEffect(() => {
     if (!email) {
       toast.error("Session expired. Please retry forgot password.");

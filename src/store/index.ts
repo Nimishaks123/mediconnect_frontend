@@ -12,6 +12,8 @@ import notificationReducer from "./notification/notificationSlice";
 import chatReducer from "./chat/chatSlice";
 import callReducer from "./call/callSlice";
 import prescriptionReducer from "./prescription/prescriptionSlice";
+import doctorAppointmentReducer
+from "./doctor/doctorAppointments/doctorAppointmentSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -26,6 +28,8 @@ export const store = configureStore({
     chat: chatReducer,
     call: callReducer,
     prescription:prescriptionReducer,
+    doctorAppointments:
+      doctorAppointmentReducer,
   },
 });
 

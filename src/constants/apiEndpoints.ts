@@ -137,6 +137,10 @@ PATIENT_WALLET: {
     "/patient/wallet/transactions",
 
 },
+DOCTOR_WALLET: {
+    WALLET: "/doctor/wallet",
+    TRANSACTIONS: "/doctor/wallet/transactions",
+},
   ADMIN_DOCTORS: {
   BASE: "/admin/doctors",
 

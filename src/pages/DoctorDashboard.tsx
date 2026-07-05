@@ -1,30 +1,78 @@
-import StatCard from "../components/doctor/dashboard/StatCard";
+import DashboardHeader from "../components/doctor/dashboard/DashboardHeader";
+import StatsCards from "../components/doctor/dashboard/StatsCards";
 import AppointmentsList from "../components/doctor/dashboard/AppointmentsList";
-import InfoCard from "../components/doctor/dashboard/InfoCard";
+import QuickActions from "../components/doctor/dashboard/QuickActions";
+import TodaySchedule from "../components/doctor/dashboard/TodaySchedule";
+import RecentActivity from "../components/doctor/dashboard/RecentActivity";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchNotifications } from "../store/notification/notificationSlice";
+
+import {
+  selectUnreadNotificationCount,
+} from "../store/notification/notificationSelectors";
+import { fetchDoctorAppointments } from "../store/doctor/doctorAppointments/doctorAppointmentThunks";
+
+import {
+  selectUpcomingAppointments,
+} from "../store/doctor/doctorAppointments/doctorAppointmentSelectors";
 
 export default function DoctorDashboard() {
+  const dispatch = useAppDispatch();
+
+const appointments =
+useAppSelector(
+    selectUpcomingAppointments
+);
+const unreadNotifications = useAppSelector(
+  selectUnreadNotificationCount
+);
+
+console.log("Upcoming Appointments:", appointments);
+useEffect(() => {
+  dispatch(fetchDoctorAppointments());
+   dispatch(fetchNotifications(1));
+}, [dispatch]);
   return (
     <>
-  {/* Stats */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <StatCard label="Total Revenue" value="850000" icon="💰" />
-          <StatCard label="New Patients" value={76} icon="🧑‍⚕️" />
-          <StatCard label="Appointments" value={50} icon="📅" />
+      {/* Header */}
+      <DashboardHeader doctorName="Neha" />
+
+      {/* Statistics */}
+      <div className="mt-6">
+        <StatsCards
+          stats={{
+            appointments: appointments.length,
+            walletBalance: 0,
+            unreadMessages: unreadNotifications,
+            prescriptions: 16,
+          }}
+        />
+      </div>
+
+      {/* Main Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6 items-start">
+
+        {/* Appointments */}
+        <div className="xl:col-span-2">
+          <AppointmentsList
+  appointments={appointments}
+/>
         </div>
 
-        {/* Chart placeholder */}
-        <div className="bg-white rounded-xl p-6 shadow mb-8 h-64 flex items-center justify-center text-gray-400">
-          📈 Statistics Chart (Recharts / Chart.js)
-        </div>
+        {/* Quick Actions */}
+        <QuickActions />
 
-        {/* Bottom section */}
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <AppointmentsList />
-          </div>
-          <InfoCard />
-        </div>
-  
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+
+        <TodaySchedule appointments={appointments}/>
+
+        <RecentActivity />
+
+      </div>
     </>
   );
 }

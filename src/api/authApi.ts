@@ -26,8 +26,12 @@ export const authApi = {
 
   signup: (data: SignupPayload) => api.post( API_ENDPOINTS.AUTH.SIGNUP, data),
 
-  getMe: () => 
-    api.get<{ success: boolean; user: LoginResponse['user'] }>( API_ENDPOINTS.AUTH.ME),
+  getMe: () =>
+  api.get<{
+    success: boolean;
+    user: LoginResponse["user"];
+    accessToken: string;
+  }>(API_ENDPOINTS.AUTH.ME),
 
   logout: () => 
     api.post(API_ENDPOINTS.AUTH.LOGOUT

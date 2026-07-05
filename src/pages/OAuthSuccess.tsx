@@ -1,11 +1,10 @@
-// src/pages/OAuthSuccess.tsx
-import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ROUTES } from "../constants/routes";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../store/auth/authSlice";
 import { authApi } from "../api/authApi";
+import { useEffect,useRef } from "react";
 
 export default function OAuthSuccess() {
   const navigate = useNavigate();
@@ -18,7 +17,7 @@ export default function OAuthSuccess() {
 
     const finalizeLogin = async () => {
       try {
-        // Fetch user profile using the HTTP-only cookie (handled by axios withCredentials)
+        // Fetch user profile using the HTTP-only cookie
         const response = await authApi.getMe();
         
         if (!response.data.success || !response.data.user) {
@@ -27,10 +26,10 @@ export default function OAuthSuccess() {
 
         const { user, accessToken } = response.data;
 
-        // Sync with Redux store (and localStorage via slice)
+        // Sync with Redux store
         dispatch(setCredentials({ 
           user: user as any, 
-          accessToken: accessToken ?? "" // Backend getMe returns this for sync
+          accessToken: accessToken ?? "" 
         }));
 
         toast.success("Login successful!");

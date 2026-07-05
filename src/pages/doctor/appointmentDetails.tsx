@@ -4,6 +4,7 @@ import { getDoctorAppointments, cancelDoctorAppointment, rescheduleDoctorAppoint
 import { api } from "../../api/api";
 import { toast } from "react-hot-toast";
 import{getPrescription } from "../../api/prescription";
+import { formatTime } from "../../utils/formatTime";
 type AppointmentForDoctor = {
   appointmentId: string;
   bookingId:string;
@@ -71,9 +72,9 @@ const [prescriptionExists, setPrescriptionExists] =
       setLoading(true);
       const res = await getDoctorAppointments();
       const allAppts = [
-        ...res.data.upcoming,
-        ...res.data.past,
-        ...res.data.recent
+        ...res.upcoming,
+        ...res.past,
+        ...res.recent
       ];
       const found = allAppts.find((a: AppointmentForDoctor) => a.appointmentId === id);
       if (found) {
@@ -81,6 +82,7 @@ const [prescriptionExists, setPrescriptionExists] =
       } else {
         toast.error("Appointment not found");
         navigate("/doctor/appointments");
+        return;
       }
     } catch (error) {
       toast.error("Failed to load appointment details.");
@@ -227,7 +229,7 @@ const [prescriptionExists, setPrescriptionExists] =
           <div>
             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Time</label>
             <p className="text-lg font-bold text-gray-900">
-              {appointment.startTime} - {appointment.endTime}
+              {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
             </p>
           </div>
           <div>

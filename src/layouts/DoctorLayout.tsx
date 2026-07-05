@@ -1,16 +1,21 @@
 import { useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+
+import { useAppDispatch } from "../store/hooks";
 import { fetchDoctorProfile } from "../store/doctor/doctorSlice";
+
 import Sidebar from "../components/doctor/dashboard/Sidebar";
 import Topbar from "../components/doctor/dashboard/Topbar";
+
 import { useBlockListener } from "../hooks/useBlockListener";
+
 export default function DoctorLayout() {
   useBlockListener();
-  const location = useLocation();
+
   const dispatch = useAppDispatch();
+  const location = useLocation();
+
   const isInitialMount = useRef(true);
-  //const { profile, loading } = useAppSelector(state => state.doctor);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -24,17 +29,39 @@ export default function DoctorLayout() {
     location.pathname.startsWith("/doctor/slots") ||
     location.pathname.startsWith("/doctor/profile");
 
-
   return (
-    <div className="flex bg-gray-100 min-h-screen">
-      {/* LEFT SIDEBAR */}
-      <Sidebar />
+    <div className="flex h-screen bg-gray-50">
 
-      {/* RIGHT CONTENT */}
-      <main className="flex-1 p-8">
-        <Topbar hideSearch={hideSearch} />
-        <Outlet />
-      </main>
+      {/* Sidebar */}
+
+      <div className="flex-shrink-0">
+        <Sidebar />
+      </div>
+
+      {/* Content */}
+
+      <div className="flex flex-1 flex-col overflow-hidden">
+
+        {/* Sticky Topbar */}
+
+        <div className="sticky top-0 z-40 bg-gray-50 px-6 pt-6">
+          <Topbar hideSearch={hideSearch} />
+        </div>
+
+        {/* Page Content */}
+
+        <main className="flex-1 overflow-y-auto px-6 pb-6">
+
+          <div className="mx-auto w-full max-w-7xl">
+
+            <Outlet />
+
+          </div>
+
+        </main>
+
+      </div>
+
     </div>
   );
 }

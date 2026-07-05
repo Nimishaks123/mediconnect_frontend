@@ -1,69 +1,159 @@
 import { NavLink } from "react-router-dom";
 import SignupImage from "../../../assets/image 16.png";
 
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  CalendarDays,
+  Clock3,
+  Users,
+  Wallet,
+  Star,
+  UserRound,
+  ChevronRight,
+} from "lucide-react";
+
 export default function Sidebar() {
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `block px-3 py-2 rounded-lg transition ${
-      isActive
-        ? "bg-white/20 font-semibold"
-        : "opacity-80 hover:bg-white/10"
-    }`;
+  const menuItems = [
+    {
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/doctor",
+      end: true,
+    },
+    {
+      label: "Appointments",
+      icon: CalendarCheck,
+      path: "/doctor/appointments",
+    },
+    {
+      label: "Manage Schedule",
+      icon: CalendarDays,
+      path: "/doctor/schedule",
+    },
+    {
+      label: "Slots",
+      icon: Clock3,
+      path: "/doctor/slots",
+    },
+    {
+      label: "Patients",
+      icon: Users,
+      path: "/doctor/patients",
+    },
+    {
+      label: "Wallet",
+      icon: Wallet,
+      path: "/doctor/wallet",
+    },
+    {
+      label: "Reviews",
+      icon: Star,
+      path: "/doctor/reviews",
+    },
+    {
+      label: "Profile",
+      icon: UserRound,
+      path: "/doctor/profile",
+    },
+  ];
 
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-sky-700 to-sky-800 text-white shadow-xl p-6">
-      {/* BRAND */}
-      <div className="flex items-center gap-3 mb-12">
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-          <img
-            src={SignupImage}
-            alt="MediConnect"
-            className="w-8 h-8 object-contain"
-          />
+    <aside className="w-64 min-h-screen bg-white border-r border-gray-100 shadow-sm flex flex-col">
+
+      {/* Logo */}
+
+      <div className="px-6 py-8 border-b border-gray-100">
+
+        <div className="flex items-center gap-3">
+
+          <div className="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center">
+
+            <img
+              src={SignupImage}
+              alt="MediConnect"
+              className="w-8 h-8 object-contain"
+            />
+
+          </div>
+
+          <div>
+
+            <h2 className="text-lg font-bold text-gray-900">
+              MediConnect
+            </h2>
+
+            <p className="text-sm text-gray-500">
+              Doctor Portal
+            </p>
+
+          </div>
+
         </div>
 
-        <div className="flex flex-col">
-          <span className="text-xl font-bold tracking-wide">
-            MediConnect
-          </span>
-          <span className="text-xs text-white/70">
-            Doctor Dashboard
-          </span>
-        </div>
       </div>
 
-      {/* NAVIGATION */}
-     <nav className="space-y-2 text-base">
-  <NavLink to="/doctor" end className={linkClass}>
-    🏠 Dashboard
-  </NavLink>
+      {/* Navigation */}
 
-  <NavLink to="/doctor/appointments" className={linkClass}>
-    📅 Appointments
-  </NavLink>
+      <nav className="flex-1 px-4 py-6 space-y-2">
 
-  <NavLink to="/doctor/schedule" className={linkClass}>
-    🗓 Manage Schedule
-  </NavLink>
+        {menuItems.map((item) => {
 
-  <NavLink to="/doctor/slots" className={linkClass}>
-    ⏱ View Slots
-  </NavLink>
+          const Icon = item.icon;
 
-  <NavLink to="/doctor/patients" className={linkClass}>
-    🧑‍🤝‍🧑 Patients
-  </NavLink>
+          return (
+            <NavLink
+              key={item.label}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) =>
+                `group flex items-center justify-between rounded-xl px-4 py-3 transition-all duration-200 ${
+                  isActive
+                    ? "bg-sky-50 text-sky-700 border border-sky-100 shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-sky-700"
+                }`
+              }
+            >
+              <div className="flex items-center gap-3">
 
-  <NavLink to="/doctor/wallet" className={linkClass}>
-    💳 Wallet
-  </NavLink>
-  <NavLink to="/doctor/reviews" className={linkClass}>
-  ⭐ Reviews
-</NavLink>
+                <Icon
+                  className="w-5 h-5"
+                  strokeWidth={2}
+                />
 
-  <NavLink to="/doctor/profile" className={linkClass}>
-    👤 Profile
-  </NavLink>
-</nav>
+                <span className="text-sm font-medium">
+                  {item.label}
+                </span>
+
+              </div>
+
+              <ChevronRight
+                className="w-4 h-4 opacity-0 group-hover:opacity-100 transition"
+              />
+
+            </NavLink>
+          );
+        })}
+
+      </nav>
+
+      {/* Footer */}
+
+      <div className="px-6 py-5 border-t border-gray-100">
+
+        <div className="rounded-xl bg-sky-50 p-4">
+
+          <p className="text-sm font-semibold text-sky-700">
+            MediConnect
+          </p>
+
+          <p className="text-xs text-gray-500 mt-1">
+            Healthcare Management System
+          </p>
+
+        </div>
+
+      </div>
 
     </aside>
   );

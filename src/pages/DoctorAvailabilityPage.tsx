@@ -40,10 +40,6 @@ const handleBook = async (
     const slotId =
 `${doctorId}_${slot.date}_${start}_${end}`;
 
-    console.log(
-      "Generated slotId:",
-      slotId
-    );
 
     await dispatch(
       bookAppointmentThunk({
