@@ -44,4 +44,6 @@ export const ROUTES = {
   ADMIN_APPOINTMENT_DETAILS: "/admin/appointments/:id",
   ADMIN_WALLETS: "/admin/wallets",
   ADMIN_WALLET_DETAILS: "/admin/wallets/:userId",
+  ADMIN_SETTINGS: "/admin/settings",
+
 } as const;

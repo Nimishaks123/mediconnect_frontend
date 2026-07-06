@@ -10,6 +10,7 @@ import AdminAppointmentsPage from "../pages/AdminAppointmentsPage";
 import AdminAppointmentDetailsPage from "../pages/AdminAppointmentDetailsPage";
 import AdminWalletsPage from "../pages/AdminWalletsPage";
 import AdminWalletDetailsPage from "../pages/AdminWalletDetailsPage";
+import AdminSettingsPage from "../pages/AdminSettingsPage";
 import { ROUTES } from "../constants/routes";
 
 export const AdminRoutes = () => (
@@ -28,6 +29,10 @@ export const AdminRoutes = () => (
         <Route path={ROUTES.ADMIN_APPOINTMENT_DETAILS} element={<AdminAppointmentDetailsPage />} />
         <Route path={ROUTES.ADMIN_WALLETS} element={<AdminWalletsPage />} />
         <Route path={ROUTES.ADMIN_WALLET_DETAILS} element={<AdminWalletDetailsPage />} />
+        <Route
+  path={ROUTES.ADMIN_SETTINGS}
+  element={<AdminSettingsPage />}
+/>
       </Route>
     </Route>
   </>

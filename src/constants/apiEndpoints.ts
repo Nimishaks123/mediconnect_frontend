@@ -43,6 +43,13 @@ ADMIN_USERS: {
   GET_TRANSACTIONS: (userId: string) =>
     `/admin/wallets/${userId}/transactions`,
 },
+ADMIN_SETTINGS: {
+  BASE: "/admin/settings",
+
+  GET: "/admin/settings",
+
+  UPDATE: "/admin/settings",
+},
 DOCTORS: {
   VERIFIED: "/doctors/verified",
   GET_BY_ID:(
