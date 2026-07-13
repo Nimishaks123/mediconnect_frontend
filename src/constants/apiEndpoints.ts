@@ -50,6 +50,10 @@ ADMIN_SETTINGS: {
 
   UPDATE: "/admin/settings",
 },
+PLATFORM_WALLET: {
+  GET: "/admin/platform-wallet",
+  TRANSACTIONS: "/admin/platform-wallet/transactions",
+},
 DOCTORS: {
   VERIFIED: "/doctors/verified",
   GET_BY_ID:(

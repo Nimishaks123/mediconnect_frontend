@@ -18,12 +18,6 @@ export const getDoctorAvailability = (
     },
   });
 
-// Book appointment (PATIENT)
-// export const bookAppointment = (data: {
-//   doctorId: string;
-//   availabilityId: string;
-// }) =>
-//   api.post( API_ENDPOINTS.APPOINTMENTS.CREATE,data);
 export const bookAppointment = (
   data: {
     doctorId: string;

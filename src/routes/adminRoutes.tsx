@@ -11,6 +11,7 @@ import AdminAppointmentDetailsPage from "../pages/AdminAppointmentDetailsPage";
 import AdminWalletsPage from "../pages/AdminWalletsPage";
 import AdminWalletDetailsPage from "../pages/AdminWalletDetailsPage";
 import AdminSettingsPage from "../pages/AdminSettingsPage";
+import PlatformWalletPage from "../pages/PlatformWalletPage";
 import { ROUTES } from "../constants/routes";
 
 export const AdminRoutes = () => (
@@ -32,6 +33,10 @@ export const AdminRoutes = () => (
         <Route
   path={ROUTES.ADMIN_SETTINGS}
   element={<AdminSettingsPage />}
+/>
+<Route
+  path={ROUTES.ADMIN_PLATFORM_WALLET}
+  element={<PlatformWalletPage />}
 />
       </Route>
     </Route>

@@ -1,0 +1,331 @@
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+
+import Pagination from "../components/common/Pagination";
+
+import {
+  getPlatformWallet,
+  getPlatformWalletTransactions,
+} from "../api/platformWalletApi";
+
+type Transaction = {
+  id: string;
+  transactionRef: string;
+  walletId: string;
+  appointmentId?: string;
+  amount: number;
+  description: string;
+  type: "CREDIT" | "DEBIT";
+  source: string;
+  createdAt: string;
+};
+
+type WalletData = {
+  balance: number;
+};
+
+export default function PlatformWalletPage() {
+  const [wallet, setWallet] =
+    useState<WalletData | null>(null);
+
+  const [transactions, setTransactions] =
+    useState<Transaction[]>([]);
+
+  const [page, setPage] =
+    useState(1);
+
+  const [totalPages, setTotalPages] =
+    useState(1);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    const loadWalletData = async () => {
+      try {
+        setLoading(true);
+
+        const walletData =
+          await getPlatformWallet();
+
+        setWallet(walletData);
+
+        const txData =
+          await getPlatformWalletTransactions(
+            page,
+            10
+          );
+
+        setTransactions(
+          txData.transactions
+        );
+
+        setTotalPages(
+          txData.totalPages
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+        setError(
+          "Unable to load platform wallet."
+        );
+
+        toast.error(
+          "Failed to load platform wallet."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
+    loadWalletData();
+
+  }, [page]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mb-4"></div>
+
+        <p className="text-xs font-black text-gray-400 uppercase tracking-widest animate-pulse">
+          Loading Platform Wallet...
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-50 p-6 text-center">
+
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+          <span className="text-3xl">⚠️</span>
+        </div>
+
+        <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-tight">
+          {error}
+        </h2>
+
+        <p className="text-gray-500 mb-8 max-w-xs mx-auto text-sm font-medium">
+          We encountered an internal server error while retrieving platform wallet data.
+        </p>
+
+        <button
+          onClick={() =>
+            window.location.reload()
+          }
+          className="bg-sky-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-sky-700 transition-all shadow-lg shadow-sky-200"
+        >
+          Try Again
+        </button>
+
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+
+      <header className="mb-8">
+
+        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          Platform Wallet
+        </h1>
+
+        <p className="mt-2 text-gray-600">
+          View platform commission balance and transaction history.
+        </p>
+
+      </header>
+
+      {/* BALANCE */}
+
+      <div className="relative overflow-hidden bg-gradient-to-br from-sky-600 to-indigo-700 rounded-3xl p-8 mb-10 shadow-xl shadow-sky-200">
+
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
+
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/5 rounded-full -ml-20 -mb-20 blur-2xl" />
+
+        <div className="relative z-10">
+
+          <p className="text-sky-100 font-bold uppercase tracking-widest text-xs mb-2">
+            Platform Balance
+          </p>
+
+          <div className="flex items-baseline gap-2">
+
+            <span className="text-white text-5xl font-black">
+              ₹{wallet?.balance.toLocaleString() ?? "0"}
+            </span>
+
+            <span className="text-sky-200 text-lg font-medium">
+              INR
+            </span>
+
+          </div>
+
+          <div className="mt-8 flex gap-4">
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 flex-1 border border-white/10">
+
+              <p className="text-sky-100 text-[10px] uppercase font-bold tracking-wider mb-1 opacity-80">
+                Revenue Source
+              </p>
+
+              <p className="text-white font-bold">
+                Appointment Commissions
+              </p>
+
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-4 py-3 flex-1 border border-white/10">
+
+              <p className="text-sky-100 text-[10px] uppercase font-bold tracking-wider mb-1 opacity-80">
+                Last Updated
+              </p>
+
+              <p className="text-white font-bold">
+                {transactions[0]
+                  ? new Date(
+                      transactions[0].createdAt
+                    ).toLocaleDateString()
+                  : "Never"}
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* TRANSACTIONS */}
+
+      <div>
+
+        <h2 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3">
+
+          Platform Transactions
+
+          <span className="h-0.5 w-12 bg-sky-600 inline-block" />
+
+        </h2>
+
+        {transactions.length === 0 ? (
+
+          <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm">
+
+            <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <span className="text-2xl opacity-50 grayscale">
+                💰
+              </span>
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-900">
+              No platform transactions yet
+            </h3>
+
+            <p className="text-gray-500 mt-1 max-w-sm mx-auto">
+              Platform commission transactions will appear here after appointments are completed.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+
+            <div className="divide-y divide-gray-50">
+
+              {transactions.map((tx) => (
+
+                <div
+                  key={tx.id}
+                  className="p-6 hover:bg-gray-50/50 transition-colors flex items-center justify-between gap-4"
+                >
+
+                  <div className="flex items-center gap-4">
+
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-sm bg-green-50 text-green-600">
+
+                      ↓
+
+                    </div>
+
+                    <div>
+
+                      <h4 className="font-bold text-gray-900">
+                        {tx.description}
+                      </h4>
+
+                      <p className="text-xs text-sky-600 font-semibold">
+                        {tx.transactionRef}
+                      </p>
+
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+
+                        {new Date(
+                          tx.createdAt
+                        ).toLocaleDateString(
+                          undefined,
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="text-lg font-black text-green-600">
+
+                      + ₹{tx.amount.toLocaleString()}
+
+                    </p>
+
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-green-100 text-green-700">
+
+                      {tx.source}
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          </div>
+
+        )}
+
+      </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
+
+    </div>
+  );
+}

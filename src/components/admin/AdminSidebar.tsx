@@ -7,7 +7,7 @@ import {
   HiCreditCard,
   HiCog
 } from "react-icons/hi";
-
+import { ROUTES } from "../../constants/routes";
 export const AdminSidebar = () => {
   return (
     <aside className="w-64 bg-white shadow-lg h-screen sticky top-0">
@@ -63,6 +63,19 @@ export const AdminSidebar = () => {
           <HiCreditCard />
           Wallets
         </NavLink>
+        <NavLink
+  to={ROUTES.ADMIN_PLATFORM_WALLET}
+  className={({ isActive }) =>
+    `flex items-center gap-3 p-3 rounded-md ${
+      isActive
+        ? "bg-blue-100 text-blue-600"
+        : "text-gray-700"
+    }`
+  }
+>
+  <HiCreditCard />
+  Platform Wallet
+</NavLink>
         <NavLink
   to="/admin/settings"
   className={({ isActive }) =>
