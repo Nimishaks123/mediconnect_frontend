@@ -1,29 +1,49 @@
+import type{ LucideIcon } from "lucide-react";
 
-const statCards = [
-  { label: "Doctors", value: 545, color: "bg-purple-100 text-purple-600" },
-  { label: "Patients", value: 765, color: "bg-orange-100 text-orange-500" },
-  { label: "Appointments", value: 80, color: "bg-amber-100 text-amber-500" },
-];
+export interface StatCard {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  color: string;
+}
 
-export const StatCards = () => {
+interface Props {
+  cards: StatCard[];
+}
+
+export const StatCards = ({ cards }: Props) => {
   return (
-    <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-          Statics
-        </p>
-        <p className="text-xs text-gray-400">Overall overview</p>
-      </div>
+    <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {cards.map((card) => {
+        const Icon = card.icon;
 
-      {statCards.map((card) => (
-        <div key={card.label} className="rounded-2xl bg-white p-6 shadow-sm">
-          <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full text-xl font-semibold ${card.color}`}>
-            {card.label[0]}
+        return (
+          <div
+            key={card.title}
+            className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100"
+          >
+            <div className="flex justify-between items-start">
+
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  {card.title}
+                </p>
+
+                <h2 className="mt-3 text-3xl font-bold text-gray-900">
+                  {card.value}
+                </h2>
+              </div>
+
+              <div
+                className={`h-12 w-12 rounded-xl flex items-center justify-center ${card.color}`}
+              >
+                <Icon className="w-6 h-6" />
+              </div>
+
+            </div>
           </div>
-          <p className="text-sm text-gray-500">{card.label}</p>
-          <p className="text-3xl font-bold text-gray-900">{card.value}</p>
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 };

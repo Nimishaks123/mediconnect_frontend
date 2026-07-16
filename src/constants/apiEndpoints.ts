@@ -54,6 +54,9 @@ PLATFORM_WALLET: {
   GET: "/admin/platform-wallet",
   TRANSACTIONS: "/admin/platform-wallet/transactions",
 },
+DASHBOARD: {
+    OVERVIEW: "/admin/dashboard/overview",
+},
 DOCTORS: {
   VERIFIED: "/doctors/verified",
   GET_BY_ID:(

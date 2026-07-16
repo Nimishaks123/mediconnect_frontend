@@ -12,6 +12,7 @@ import AdminWalletsPage from "../pages/AdminWalletsPage";
 import AdminWalletDetailsPage from "../pages/AdminWalletDetailsPage";
 import AdminSettingsPage from "../pages/AdminSettingsPage";
 import PlatformWalletPage from "../pages/PlatformWalletPage";
+import AdminDashboardPage from "../pages/AdminDashboardPage";
 import { ROUTES } from "../constants/routes";
 
 export const AdminRoutes = () => (
@@ -20,7 +21,7 @@ export const AdminRoutes = () => (
 
     <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
       <Route element={<AdminLayout />}>
-        <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
+        {/* <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} /> */}
         <Route
           path={ROUTES.ADMIN_PENDING_DOCTORS}
           element={<PendingDoctorsPage />}
@@ -37,6 +38,10 @@ export const AdminRoutes = () => (
 <Route
   path={ROUTES.ADMIN_PLATFORM_WALLET}
   element={<PlatformWalletPage />}
+/>
+<Route
+  path={ROUTES.ADMIN_DASHBOARD}
+  element={<AdminDashboardPage />}
 />
       </Route>
     </Route>
