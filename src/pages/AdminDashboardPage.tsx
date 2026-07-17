@@ -1,4 +1,6 @@
 import DashboardOverview from "../components/dashboard/DashboardOverview";
+import RevenueChart from "../components/dashboard/RevenueChart";
+import AppointmentStatusChart from "../components/dashboard/AppointmentStatusChart";
 
 export default function AdminDashboardPage() {
   return (
@@ -17,6 +19,11 @@ export default function AdminDashboardPage() {
       </div>
 
       <DashboardOverview />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RevenueChart />
+        <AppointmentStatusChart />
+      </div>
 
     </div>
   );

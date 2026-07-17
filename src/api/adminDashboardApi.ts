@@ -8,3 +8,19 @@ export const getDashboardOverview = async () => {
 
   return res.data.data;
 };
+
+export const getRevenueTrend = async () => {
+  const res = await api.get(
+    API_ENDPOINTS.DASHBOARD.REVENUE_TREND
+  );
+
+  return res.data.data;
+};
+
+export const getAppointmentStatusAnalytics = async () => {
+  const res = await api.get(
+    API_ENDPOINTS.DASHBOARD.APPOINTMENT_STATUS
+  );
+
+  return res.data.data;
+};

@@ -56,6 +56,11 @@ PLATFORM_WALLET: {
 },
 DASHBOARD: {
     OVERVIEW: "/admin/dashboard/overview",
+    REVENUE_TREND: "/admin/dashboard/revenue-trend",
+    APPOINTMENT_STATUS: "/admin/dashboard/appointment-status",
+},
+DOCTOR_DASHBOARD: {
+    RECENT_ACTIVITY: "/doctor/dashboard/recent-activity",
 },
 DOCTORS: {
   VERIFIED: "/doctors/verified",
