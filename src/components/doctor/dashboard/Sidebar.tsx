@@ -36,11 +36,11 @@ export default function Sidebar() {
       icon: Clock3,
       path: "/doctor/slots",
     },
-    {
-      label: "Patients",
-      icon: Users,
-      path: "/doctor/patients",
-    },
+    // {
+    //   label: "Patients",
+    //   icon: Users,
+    //   path: "/doctor/patients",
+    // },
     {
       label: "Wallet",
       icon: Wallet,

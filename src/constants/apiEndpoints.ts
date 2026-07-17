@@ -185,4 +185,7 @@ PRESCRIPTIONS: {
     appointmentId: string
   ) => `/prescriptions/${appointmentId}`,
 },
+PUBLIC: {
+  STATS: "/public/stats",
+}
 }

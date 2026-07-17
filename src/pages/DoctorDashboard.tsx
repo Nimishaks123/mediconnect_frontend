@@ -27,8 +27,6 @@ useAppSelector(
 const unreadNotifications = useAppSelector(
   selectUnreadNotificationCount
 );
-
-console.log("Upcoming Appointments:", appointments);
 useEffect(() => {
   dispatch(fetchDoctorAppointments());
    dispatch(fetchNotifications(1));

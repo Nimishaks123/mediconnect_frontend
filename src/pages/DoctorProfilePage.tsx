@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { selectCurrentUser } from "../store/auth/authSlice";
+import { selectCurrentUser, setCredentials } from "../store/auth/authSlice";
 import { fetchDoctorProfile } from "../store/doctor/doctorSlice";
 import { doctorOnboardingApi } from "../api/doctorOnboardingApi";
 import { uploadApi } from "../api/uploadApi";
@@ -33,6 +33,7 @@ export default function DoctorProfilePage() {
   
   // Edit State
   const [editForm, setEditForm] = useState({
+    name: "",
     specialty: "",
     qualification: "",
     experience: 0,
@@ -48,6 +49,7 @@ export default function DoctorProfilePage() {
   useEffect(() => {
     if (profile) {
       setEditForm({
+        name: user?.name || "",
         specialty: profile.specialty || "",
         qualification: profile.qualification || "",
         experience: profile.experience || 0,
@@ -114,12 +116,19 @@ export default function DoctorProfilePage() {
   setUpdating(true);
 
   try {
-    await doctorOnboardingApi.updateBasicInfo(result.data);
+    const res = await doctorOnboardingApi.updateBasicInfo(result.data);
 
     showSuccess("Profile updated successfully");
     setIsEditing(false);
 
     dispatch(fetchDoctorProfile());
+    
+    if (res.data?.user?.name && user) {
+       dispatch(setCredentials({ 
+         user: { ...user, name: res.data.user.name }, 
+         accessToken: localStorage.getItem("accessToken") || "" 
+       }));
+    }
   } catch (err: any) {
     showError(
       err.response?.data?.message ||
@@ -246,6 +255,16 @@ export default function DoctorProfilePage() {
                 {/* Editable Fields */}
                 <div className="space-y-6">
                   <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                    <input 
+                      type="text"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                      value={editForm.name}
+                      onChange={e => setEditForm({...editForm, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Specialty</label>
                     <input 
                       type="text"
@@ -305,6 +324,31 @@ export default function DoctorProfilePage() {
                      <p className="text-xs font-bold text-blue-800 uppercase tracking-widest mb-1">Photo Update Policy</p>
                      <p className="text-[10px] text-blue-600 leading-relaxed font-medium">To update your profile headshot, use the camera icon overlay on your existing photo in the header. Only high-quality images under 2MB are accepted.</p>
                   </div>
+                  
+                  {/* Read-Only Locked Fields */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                      <CheckCircleIcon className="w-4 h-4" />
+                      Verified Identity Data (Locked)
+                    </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Registration Number</label>
+                        <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed">
+                           <IdentificationIcon className="w-5 h-5" />
+                           <span className="font-mono text-sm">{profile.registrationNumber}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Medical License</label>
+                        <div className="flex items-center gap-2 px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed">
+                           <DocumentArrowDownIcon className="w-5 h-5" />
+                           <span className="text-sm truncate">Verified License Document</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
                 </div>
               </div>
 

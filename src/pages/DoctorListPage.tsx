@@ -4,14 +4,20 @@ import { fetchVerifiedDoctors } from "../store/appointments/appointmentThunks";
 import SpecialistsList from "../components/dashboard/SpecialistsList";
 import { getDoctorSpecialties } from "../api/doctors";
 import { socketService } from "../services/socketService";
+import { useLocation } from "react-router-dom";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 
 export default function DoctorListPage() {
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const [page, setPage] = useState(1);
-  const [specialty, setSpecialty] = useState("");
+  const [specialty, setSpecialty] = useState(searchParams.get("specialty") || "");
   const [sortBy, setSortBy] = useState("");
-  const [experience, setExperience] = useState("");
+  const [experience, setExperience] = useState(searchParams.get("experience") || "");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("searchQuery") || "");
   const [specialties, setSpecialties] = useState<string[]>([]);
 
   const {
@@ -23,7 +29,7 @@ export default function DoctorListPage() {
     (state) => state.appointments
   );
 
-  const PAGE_SIZE = 2;
+  const PAGE_SIZE = 6;
 
   // Fetch doctors
   useEffect(() => {
@@ -33,7 +39,8 @@ export default function DoctorListPage() {
         limit: PAGE_SIZE,
         specialty,
         experience,
-        sortBy
+        sortBy,
+        searchQuery
       })
     );
   }, [
@@ -41,7 +48,8 @@ export default function DoctorListPage() {
     page,
     specialty,
     experience,
-    sortBy
+    sortBy,
+    searchQuery
   ]);
 
   // Listen for doctor block/unblock events
@@ -72,7 +80,8 @@ export default function DoctorListPage() {
             limit: PAGE_SIZE,
             specialty,
             experience,
-            sortBy
+            sortBy,
+            searchQuery
           })
         );
       }
@@ -94,7 +103,8 @@ export default function DoctorListPage() {
     page,
     specialty,
     experience,
-    sortBy
+    sortBy,
+    searchQuery
   ]);
 
   // Fetch specialties
@@ -149,10 +159,12 @@ export default function DoctorListPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
-      {/* <h2 className="text-2xl font-semibold">
-        Available Doctors
-      </h2> */}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      <div className="flex-1 max-w-5xl mx-auto w-full px-6 py-10 space-y-6">
+        {/* <h2 className="text-2xl font-semibold">
+          Available Doctors
+        </h2> */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
   <h2 className="text-2xl font-semibold">
     Available Doctors
@@ -209,6 +221,8 @@ export default function DoctorListPage() {
   total={total}
   onPageChange={setPage}
 />
+      </div>
+      <Footer />
     </div>
   );
 }

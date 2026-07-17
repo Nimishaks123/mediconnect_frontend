@@ -8,6 +8,8 @@ import GoogleStart from "../pages/GoogleStart";
 import ForgotPasswordEmailPage from "../pages/ForgotPasswordEmailPage";
 import ForgotPasswordOtpPage from "../pages/ForgotPasswordOtpPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
+import DoctorListPage from "../pages/DoctorListPage";
+import DoctorDetailsPage from "../pages/DoctorDetailsPage";
 import { ROUTES } from "../constants/routes";
 
 
@@ -25,6 +27,8 @@ export const PublicRoutes = () => (
     <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordEmailPage />} />
     <Route path={ROUTES.FORGOT_PASSWORD_OTP} element={<ForgotPasswordOtpPage />} />
     <Route path={ROUTES.FORGOT_PASSWORD_RESET} element={<ResetPasswordPage />} />
+    <Route path={ROUTES.DOCTORS} element={<DoctorListPage />} />
+    <Route path="/doctors/:doctorId" element={<DoctorDetailsPage />} />
 
   </>
 );

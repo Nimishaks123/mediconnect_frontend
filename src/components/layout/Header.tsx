@@ -33,9 +33,7 @@ const Header: React.FC = () => {
 
   const navLinks = [
     { label: "Home", to: homeRoute },
-    { label: "Services", to: "/services" },
-    { label: "Contact Us", to: "/contact" },
-    { label: "About Us", to: "/about" },
+    { label: "Doctors", to: "/doctors" },
   ];
 
   // ROUTE DETECTION

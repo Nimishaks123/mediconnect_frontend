@@ -88,6 +88,7 @@ export interface FetchDoctorsParams {
   specialty?: string;
   experience?: string;
   sortBy?:string;
+  searchQuery?: string;
 }
 
 export const fetchVerifiedDoctors = createAsyncThunk<

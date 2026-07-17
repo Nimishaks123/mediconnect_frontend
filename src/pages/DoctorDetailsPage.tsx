@@ -18,6 +18,8 @@ import {
 
 import defaultDoctor
 from "../assets/default-doctor.jpeg";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 
 import {
   Star,
@@ -129,9 +131,9 @@ export default function DoctorDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
-
-      <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-[#f7f9fc] flex flex-col">
+      <Header />
+      <div className="flex-1 max-w-7xl mx-auto w-full px-6 py-10">
 
         {/* BREADCRUMB */}
         <div className="mb-6 text-sm text-gray-500">
@@ -489,6 +491,7 @@ export default function DoctorDetailsPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

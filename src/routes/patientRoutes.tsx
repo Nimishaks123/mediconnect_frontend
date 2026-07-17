@@ -15,7 +15,6 @@ import PatientProfilePage from "../pages/PatientProfilePage";
 
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentCancelledPage from "../pages/PaymentCancelledPage";
-import DoctorDetailsPage from "../pages/DoctorDetailsPage";
 import WalletTopupSuccessPage from "../pages/WalletTopupSuccessPage";
 import WalletTopupCancelPage from "../pages/WalletTopupCancelPage";
 
@@ -27,7 +26,6 @@ export const PatientRoutes = () => (
     {/* <Route element={<UserLayout />}> */}
     <Route element={<PatientDashboardLayout />}>
       <Route path={ROUTES.USER_DASHBOARD} element={<UserDashboard />} />
-      <Route path={ROUTES.DOCTORS} element={<DoctorListPage />} />
       <Route path={ROUTES.DOCTOR_AVAILABILITY} element={<DoctorAvailabilityPage />} />
       <Route path="/patient/appointments/:doctorId" element={<DoctorAppointmentPage />} />
       <Route path={ROUTES.PATIENT_APPOINTMENTS} element={<PatientAppointmentsPage />} />
@@ -45,10 +43,6 @@ export const PatientRoutes = () => (
 <Route
   path="/wallet/cancel"
   element={<WalletTopupCancelPage />}
-/>
-      <Route
-  path="/doctors/:doctorId"
-  element={<DoctorDetailsPage />}
 />
     </Route>
   </Route>
