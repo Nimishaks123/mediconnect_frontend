@@ -51,7 +51,6 @@ console.log("PROTECTED ROUTE", {
   if (user.role === "DOCTOR") {
     const path = location.pathname;
     const isAccessingOnboarding = path.startsWith("/doctor/onboarding");
-    const isAccessingStatusPages = path === ROUTES.DOCTOR_PENDING || path === ROUTES.DOCTOR_REJECTED || path === ROUTES.DOCTOR_PROFILE;
 
     if (user.onboardingStatus === "APPROVED") {
       if (isAccessingOnboarding || path === ROUTES.DOCTOR_PENDING) {

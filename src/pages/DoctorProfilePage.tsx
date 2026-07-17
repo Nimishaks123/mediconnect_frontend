@@ -16,7 +16,6 @@ import {
   XCircleIcon,
   XMarkIcon,
   PencilSquareIcon,
-  PhotoIcon,
   EyeIcon,
   DocumentArrowDownIcon,
   CameraIcon
@@ -26,7 +25,7 @@ import { DoctorProfileSchema } from "../validation/doctorProfileSchema";
 export default function DoctorProfilePage() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectCurrentUser);
-  const { profile, loading, error } = useAppSelector((state) => state.doctor);
+  const { profile, loading} = useAppSelector((state) => state.doctor);
   
   const [isEditing, setIsEditing] = useState(false);
   const [showCerts, setShowCerts] = useState(false);

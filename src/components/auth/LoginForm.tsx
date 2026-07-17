@@ -127,12 +127,7 @@ useEffect(()=>{
     navigate("/auth/google-start?role=patient");
   };
 
-  const handleDoctorGoogleLogin = () => {
-    navigate("/auth/google-start?role=doctor");
-  };
-
-
-  return (
+ return (
     <div className="container mx-auto px-6 py-16">
       <h1 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-12">
         Welcome Back

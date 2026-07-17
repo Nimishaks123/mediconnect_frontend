@@ -2,15 +2,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
 import { adminDoctorApi } from "../../api/adminDoctorApi";
 import type { PendingDoctor } from "../../types/adminDoctor";
-
-/* -------------------- FETCH PENDING DOCTORS -------------------- */
 export const fetchPendingDoctors = createAsyncThunk<
   PendingDoctor[],
   void,
   { rejectValue: string }
 >("adminDoctors/fetchPending", async (_, { rejectWithValue }) => {
   try {
-    const res = await adminDoctorApi.getPendingDoctors();
+   const res = await adminDoctorApi.getAdminDoctors({
+  status: "PENDING",
+  page: 1,
+  limit: 100,
+});
     return res.data.doctors as PendingDoctor[];
   } catch (error: unknown) {
     const err = error as AxiosError<{ message?: string }>;
@@ -20,7 +22,6 @@ export const fetchPendingDoctors = createAsyncThunk<
   }
 });
 
-/* -------------------- APPROVE DOCTOR -------------------- */
 export const approveDoctor = createAsyncThunk<
   string,
   string,
@@ -37,7 +38,6 @@ export const approveDoctor = createAsyncThunk<
   }
 });
 
-/* -------------------- REJECT DOCTOR -------------------- */
 export const rejectDoctor = createAsyncThunk<
   string,
   { userId: string; reason: string },
@@ -54,7 +54,6 @@ export const rejectDoctor = createAsyncThunk<
   }
 });
 
-/* -------------------- STATE -------------------- */
 interface AdminDoctorState {
   pendingDoctors: PendingDoctor[];
   loading: boolean;
@@ -67,7 +66,6 @@ const initialState: AdminDoctorState = {
   error: null,
 };
 
-/* -------------------- SLICE -------------------- */
 const adminDoctorSlice = createSlice({
   name: "adminDoctors",
   initialState,

@@ -37,7 +37,7 @@ const [amount, setAmount] =
   const [transactions, setTransactions] =
   useState<Transaction[]>([]);
 
-const [totalTransactions, setTotalTransactions] =
+const [, setTotalTransactions] =
   useState(0);
 
 const [page, setPage] =

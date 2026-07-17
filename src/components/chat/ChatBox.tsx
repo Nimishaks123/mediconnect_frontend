@@ -27,7 +27,6 @@ import {
 
 import {
   PaperAirplaneIcon,
-  ChatBubbleLeftRightIcon,
   CheckIcon,
   CheckBadgeIcon,
   VideoCameraIcon
@@ -60,14 +59,6 @@ const formatDate = (
   ).format(date);
 };
 
-const getComparisonDate =
-  (date: Date) => {
-
-    return date
-      .toISOString()
-      .split("T")[0];
-  };
-
 interface ChatBoxProps {
 
   receiverId: string;
@@ -87,7 +78,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   receiverId,
   receiverName,
   conversationId,
-  appointment
 }) => {
 
   const navigate =
@@ -103,8 +93,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
 
   const {
     messages,
-    loading,
-    typingUsers,
     recipientOnline
   } = useAppSelector(
     (state) => state.chat
@@ -127,9 +115,6 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const typingTimeoutRef =
     useRef<any>(null);
 
-  const isTyping =
-    typingUsers[conversationId] || false;
-
   const scrollToBottom =
     (
       behavior:
@@ -143,13 +128,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     };
 
   useEffect(() => {
-      console.log(
-    "ChatBox conversationId:",
-    conversationId
-  );
-
-
-    if (conversationId) {
+   if (conversationId) {
 
       dispatch(
         setActiveConversation(

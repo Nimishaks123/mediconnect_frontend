@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import { selectCurrentUser } from "../../store/auth/authSlice";

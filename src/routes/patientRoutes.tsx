@@ -1,11 +1,8 @@
-// Router mapping
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import { ROLES } from "../constants/roles";
-//import UserLayout from "../layouts/UserLayout";
 import PatientDashboardLayout from "../components/layout/PatientDashboardLayout";
 import UserDashboard from "../pages/UserDashboard";
-import DoctorListPage from "../pages/DoctorListPage";
 import DoctorAvailabilityPage from "../pages/DoctorAvailabilityPage";
 import DoctorAppointmentPage from "../pages/DoctorAppointmentPage";
 import PatientAppointmentsPage from "../pages/PatientAppointmentsPage";

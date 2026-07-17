@@ -1,9 +1,7 @@
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
-
 import AdminLogin from "../pages/AdminLogin";
-import AdminDashboard from "../pages/AdminDashboard";
 import PendingDoctorsPage from "../pages/PendingDoctorsPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AdminAppointmentsPage from "../pages/AdminAppointmentsPage";

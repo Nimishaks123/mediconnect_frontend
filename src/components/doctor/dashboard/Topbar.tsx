@@ -43,7 +43,7 @@ export default function Topbar({
     user.name || user.email.split("@")[0];
 
   const profileImage =
-    doctorProfile?.photo ?? null;
+    doctorProfile?.profilePhoto ?? null;
 
   const today = new Date().toLocaleDateString(
     "en-IN",

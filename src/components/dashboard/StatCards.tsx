@@ -24,7 +24,7 @@ const StatsCards = ({ stats }: Props) => {
     },
     {
       title: "Wallet Balance",
-      value: `$${stats?.walletBalance || 0}`,
+      value: `₹${stats?.walletBalance || 0}`,
       icon: Wallet,
       bg: "bg-cyan-100",
     },

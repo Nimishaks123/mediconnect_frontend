@@ -17,7 +17,7 @@ export default function DoctorListPage() {
   const [specialty, setSpecialty] = useState(searchParams.get("specialty") || "");
   const [sortBy, setSortBy] = useState("");
   const [experience, setExperience] = useState(searchParams.get("experience") || "");
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("searchQuery") || "");
+  const [searchQuery, ] = useState(searchParams.get("searchQuery") || "");
   const [specialties, setSpecialties] = useState<string[]>([]);
 
   const {

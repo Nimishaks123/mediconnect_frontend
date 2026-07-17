@@ -23,12 +23,6 @@ export default function DashboardHeader({
     greeting = "Good Afternoon";
   }
 
-  const today = new Date().toLocaleDateString("en-IN", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   return (
     <div className="mb-6">

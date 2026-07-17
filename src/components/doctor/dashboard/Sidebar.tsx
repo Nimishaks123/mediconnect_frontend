@@ -6,7 +6,6 @@ import {
   CalendarCheck,
   CalendarDays,
   Clock3,
-  Users,
   Wallet,
   Star,
   UserRound,

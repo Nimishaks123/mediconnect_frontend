@@ -8,8 +8,6 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import SignupImage
-from "../../assets/image 16.png";
 
 import {
   useAppSelector,

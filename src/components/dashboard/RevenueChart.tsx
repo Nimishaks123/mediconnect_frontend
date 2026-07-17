@@ -107,10 +107,10 @@ export default function RevenueChart() {
           />
 
           <Tooltip
-            formatter={(value: number) => [
-              `₹${value.toLocaleString()}`,
-              "Revenue",
-            ]}
+           formatter={(value) => [
+  `₹${Number(value ?? 0)}`,
+  "Revenue",
+]}
             contentStyle={{
               borderRadius: "12px",
               border: "1px solid #e5e7eb",

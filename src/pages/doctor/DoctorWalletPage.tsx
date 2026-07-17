@@ -27,69 +27,17 @@ type WalletData = {
 export default function PatientWalletPage() {
   const [totalPages, setTotalPages] =
   useState(1);
-  
-//   const [showTopupModal, setShowTopupModal] =
-//   useState(false);
-
-// const [amount, setAmount] =
-//   useState("");
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [transactions, setTransactions] =
   useState<Transaction[]>([]);
 
-const [totalTransactions, setTotalTransactions] =
+const [, setTotalTransactions] =
   useState(0);
 
 const [page, setPage] =
   useState(1);
   const [loading, setLoading] = useState(true);
-//   const [topupLoading, setTopupLoading] =
-//   useState(false);
   const [error, setError] = useState<string | null>(null);
-  //const transactions = wallet?.transactions ?? [];
-//   const handleTopup =
-//   async () => {
-
-//   if (!amount) {
-//     toast.error("Please enter an amount");
-//     return;
-//   }
-
-//   if (Number(amount) < 100) {
-//     toast.error(
-//       "Minimum topup amount is ₹100"
-//     );
-//     return;
-//   }
-
-
-//     try {
-
-//     setTopupLoading(true);
-
-//       const response =
-//         await topupWallet(
-//           Number(amount)
-//         );
-
-//       window.location.href =
-//         response.data.checkoutUrl;
-
-//     } catch (error) {
-
-//       console.error(error);
-
-//       toast.error(
-//         "Failed to start payment"
-//       );
-//     }
-//     finally {
-
-//     setTopupLoading(false);
-
-//   }
-//   };
-
   useEffect(() => {
 
   const loadWalletData = async () => {
@@ -109,13 +57,7 @@ const [page, setPage] =
     page,
     10
   );
-
-        console.log(
-  "Transactions API:",
-  txData
-);
-
-      setTransactions(
+setTransactions(
   txData.transactions
 );
 

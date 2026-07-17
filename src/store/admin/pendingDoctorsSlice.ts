@@ -3,8 +3,7 @@ import type { AxiosError } from "axios";
 
 import { adminDoctorApi } from "../../api/adminDoctorApi";
 import type { PendingDoctor } from "../../api/adminDoctorApi";
-
-/* -------------------- STATE -------------------- */
+//state
 interface PendingDoctorsState {
   loading: boolean;
   error: string | null;
@@ -31,7 +30,6 @@ const initialState: PendingDoctorsState = {
   },
 };
 
-/* -------------------- FETCH ADMIN DOCTORS -------------------- */
 export const fetchAdminDoctors = createAsyncThunk<
   { doctors: PendingDoctor[]; pagination: any; total: number },
   { status: "PENDING" | "APPROVED" | "REJECTED"; page: number; limit: number; search?: string; sort?: string },
@@ -52,7 +50,6 @@ export const fetchAdminDoctors = createAsyncThunk<
   }
 });
 
-/* -------------------- APPROVE DOCTOR -------------------- */
 export const approveDoctor = createAsyncThunk<
   string,
   string,
@@ -69,7 +66,6 @@ export const approveDoctor = createAsyncThunk<
   }
 });
 
-/* -------------------- REJECT DOCTOR -------------------- */
 export const rejectDoctor = createAsyncThunk<
   string,
   { userId: string; reason: string },

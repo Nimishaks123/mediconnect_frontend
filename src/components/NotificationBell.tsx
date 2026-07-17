@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchNotifications, markAsRead } from "../store/notification/notificationSlice";
-import { BellIcon, CheckCircleIcon, ClockIcon, CreditCardIcon, ChatBubbleLeftIcon, ExclamationCircleIcon, XCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { BellIcon,ClockIcon, CreditCardIcon, ChatBubbleLeftIcon, ExclamationCircleIcon, XCircleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 const getTimeAgo = (date: Date) => {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
   let interval = seconds / 31536000;

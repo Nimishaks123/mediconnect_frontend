@@ -5,7 +5,6 @@ import {
   Stethoscope,
   CalendarDays,
   Wallet,
-  MessageCircle,
   User,
   LogOut,
 } from "lucide-react";

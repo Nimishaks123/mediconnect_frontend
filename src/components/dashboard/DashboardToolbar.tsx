@@ -1,10 +1,8 @@
 import { MagnifyingGlassIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
-import { useAppSelector } from "../../store/hooks";
 
 const DashboardHeader = () => {
-  const user = useAppSelector((state) => state.auth.user);
 
-  return (
+return (
     <section className="mb-8 flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
       <div>
       </div>

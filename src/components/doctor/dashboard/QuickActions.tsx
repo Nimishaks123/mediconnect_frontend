@@ -4,7 +4,6 @@ import {
   FileText,
   Wallet,
   Star,
-  Clock,
   ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";

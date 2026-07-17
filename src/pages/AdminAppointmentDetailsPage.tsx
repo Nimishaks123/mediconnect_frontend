@@ -8,7 +8,6 @@ import {
   ClockIcon,
   UserIcon,
   CurrencyDollarIcon,
-  MapPinIcon,
   CheckCircleIcon,
   XCircleIcon,
   VideoCameraIcon,

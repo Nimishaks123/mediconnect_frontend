@@ -15,7 +15,6 @@ import {
   IdentificationIcon,
   CheckCircleIcon,
   XCircleIcon,
-  UserCircleIcon,
   ClockIcon,
   CalendarIcon,
   ExclamationTriangleIcon

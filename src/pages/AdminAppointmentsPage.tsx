@@ -7,7 +7,6 @@ import {
   ClockIcon, 
   ChevronLeftIcon, 
   ChevronRightIcon,
-  EllipsisHorizontalIcon,
   MagnifyingGlassIcon,
   ArrowTopRightOnSquareIcon
 } from "@heroicons/react/24/outline";

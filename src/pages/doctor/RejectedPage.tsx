@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { XCircleIcon, UserCircleIcon, ArrowLeftOnRectangleIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { ROUTES } from "../../constants/routes";

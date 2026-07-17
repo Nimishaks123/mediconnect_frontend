@@ -71,25 +71,7 @@ const UserDashboard = () => {
    const appointments =
           await getMyAppointments();
           console.log(appointments)
-  //         const upcomingAppointments =
-  // appointments
-  //   .filter(
-  //     (appointment: any) =>
-  //       appointment.status ===
-  //         "CONFIRMED" &&
-  //       new Date(
-  //         appointment.date
-  //       ) >= new Date()
-  //   )
-  //   .sort(
-  //     (a: any, b: any) =>
-  //       new Date(
-  //         a.date
-  //       ).getTime() -
-  //       new Date(
-  //         b.date
-  //       ).getTime()
-  //   );
+ 
     const today = new Date();
 today.setHours(0, 0, 0, 0);
 
@@ -119,13 +101,7 @@ const upcomingAppointments =
 
         const wallet =
           await getMyWallet();
-          console.log("Appointments:", appointments);
-
-console.log(
-  "Upcoming:",
-  upcomingAppointments
-);
-
+  
         setDashboardData({
           appointments,
 
@@ -198,14 +174,8 @@ console.log(
 
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="space-y-6">
 
-          {/* Future widgets */}
-
-          {/* Recent Activity */}
-          {/* Health Summary */}
-          {/* Quick Actions */}
 
         </div>
 

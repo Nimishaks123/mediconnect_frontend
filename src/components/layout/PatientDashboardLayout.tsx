@@ -1,7 +1,5 @@
-import Sidebar from "../../components/dashboard/sideBar";
-//import Header from "./Header";
-import DashboardToolbar from "../dashboard/DashboardToolbar";
-import DashboardHeader from "../dashboard/DashboardHeader";
+import Sidebar from "../../components/dashboard/Sidebar";
+import DashboardHeader from "../dashboard/dashboardHeader";
 import { Outlet } from "react-router-dom";
 
 const PatientDashboardLayout = () => {

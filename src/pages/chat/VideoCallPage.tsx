@@ -8,7 +8,6 @@ import {
   MicrophoneIcon, 
   VideoCameraIcon, 
   PhoneXMarkIcon,
-  VideoCameraSlashIcon
 } from "@heroicons/react/24/solid";
 import { showInfo, showError } from "../../utils/toastUtils";
 import { ROLES } from "../../constants/roles";
@@ -24,8 +23,6 @@ const VideoCallPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
   const navigate = useNavigate();
   const user = useAppSelector(selectCurrentUser);
-  const { status: callStatus } = useAppSelector((state) => state.call);
-  
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -43,7 +40,6 @@ const VideoCallPage: React.FC = () => {
   const hasAnswered = useRef(false);
   const hasHandledPeerJoin = useRef(false);
   const hasCleanedUp = useRef(false);
-  const hasInitializedPC = useRef(false);
 
   const cleanupCall = () => {
     if (hasCleanedUp.current) return;
