@@ -11,13 +11,19 @@ import {
   MapPinIcon,
   CheckCircleIcon,
   XCircleIcon,
-  VideoCameraIcon
+  VideoCameraIcon,
+  DocumentTextIcon,
+  ExclamationCircleIcon,
+  BeakerIcon,
+  ClipboardDocumentListIcon
 } from "@heroicons/react/24/outline";
+import { getPrescription } from "../api/prescription";
 
 export default function AdminAppointmentDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [appointment, setAppointment] = useState<any>(null);
+  const [prescription, setPrescription] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,6 +33,15 @@ export default function AdminAppointmentDetailsPage() {
         setLoading(true);
         const res = await adminAppointmentApi.getAppointmentDetails(id);
         setAppointment(res.data);
+        
+        try {
+          const pRes = await getPrescription(id);
+          if (pRes && pRes.data) {
+             setPrescription(pRes.data);
+          }
+        } catch (err) {
+          // No prescription found, ignore and let empty state render
+        }
       } catch (err) {
         toast.error("Failed to fetch appointment details");
         navigate("/admin/appointments");
@@ -146,6 +161,88 @@ export default function AdminAppointmentDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Prescription Section */}
+      <div className="mt-12 space-y-6">
+        <h3 className="text-2xl font-black text-gray-900 flex items-center gap-3">
+          <DocumentTextIcon className="w-8 h-8 text-blue-600" />
+          Prescription
+        </h3>
+        
+        {!prescription ? (
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-12 text-center flex flex-col items-center justify-center space-y-4">
+            <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center">
+              <ExclamationCircleIcon className="w-8 h-8" />
+            </div>
+            <p className="text-gray-500 font-bold text-lg">No prescription has been created for this appointment.</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-10 space-y-8">
+            {/* Diagnosis */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                 Diagnosis
+              </h4>
+              <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl">
+                 <p className="text-lg font-bold text-gray-900">{prescription.diagnosis}</p>
+                 {prescription.notes && (
+                   <p className="text-sm font-medium text-gray-600 mt-2">Symptoms: {prescription.notes}</p>
+                 )}
+              </div>
+            </div>
+
+            {/* Medicines */}
+            <div className="space-y-4 pt-6 border-t border-gray-100">
+               <h4 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                 <BeakerIcon className="w-4 h-4" /> Medicines
+              </h4>
+               <div className="overflow-x-auto rounded-2xl border border-gray-100">
+                 <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="p-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-100">Medicine</th>
+                        <th className="p-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-100">Dosage</th>
+                        <th className="p-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-100">Frequency</th>
+                        <th className="p-4 text-xs font-black text-gray-500 uppercase tracking-widest border-b border-gray-100">Duration</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {prescription.medicines?.map((med: any, index: number) => (
+                        <tr key={index} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="p-4 font-bold text-gray-900">{med.name}</td>
+                          <td className="p-4 font-semibold text-gray-600">{med.dosage}</td>
+                          <td className="p-4 font-semibold text-gray-600">{med.frequency}</td>
+                          <td className="p-4 font-semibold text-gray-600">{med.duration}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                 </table>
+               </div>
+            </div>
+
+            {/* Additional Notes */}
+            <div className="space-y-4 pt-6 border-t border-gray-100">
+               <h4 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                 <ClipboardDocumentListIcon className="w-4 h-4" /> Additional Notes
+              </h4>
+              <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
+                 <p className="text-gray-700 whitespace-pre-wrap">{prescription.notes || "No additional notes provided."}</p>
+              </div>
+            </div>
+
+            {/* Follow up Date */}
+            {prescription.followUpDate && (
+              <div className="space-y-4 pt-6 border-t border-gray-100">
+                 <h4 className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                   <CalendarIcon className="w-4 h-4" /> Follow-up Date
+                </h4>
+                <p className="text-lg font-bold text-gray-900">{new Date(prescription.followUpDate).toLocaleDateString()}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }

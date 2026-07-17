@@ -156,8 +156,13 @@ const menuItems = [
 export const AdminSidebar = () => {
   return (
     <aside className="w-64 bg-white shadow-lg h-screen sticky top-0">
-      <div className="p-6 text-2xl font-bold text-blue-600 border-b">
-        MediConnect Admin
+      <div className="p-6 border-b flex flex-col items-start gap-1">
+        <span className="text-2xl font-bold text-mediconnect-green">
+          MediConnect
+        </span>
+        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+          Admin Portal
+        </span>
       </div>
 
       <nav className="mt-6 space-y-2 px-4">
