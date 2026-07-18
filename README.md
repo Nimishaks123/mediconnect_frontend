@@ -1,73 +1,127 @@
-# React + TypeScript + Vite
+# MediConnect
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MediConnect is a full-stack healthcare appointment booking platform built to streamline the interaction between patients, doctors, and administrators. The application provides secure appointment scheduling, online consultations, digital prescriptions, wallet management, and role-based dashboards within a scalable Clean Architecture.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The platform enables:
 
-## React Compiler
+- Patients to discover verified doctors, book appointments, make secure payments, attend video consultations, and access digital prescriptions.
+- Doctors to manage their professional profile, availability, appointments, consultations, and prescriptions.
+- Administrators to verify doctors, manage users, monitor appointments, oversee platform transactions, and access operational analytics.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Key Features
 
-## Expanding the ESLint configuration
+### Patient
+- Secure authentication with email OTP and Google OAuth
+- Search and filter verified doctors
+- Appointment booking and cancellation
+- Stripe payment integration
+- Wallet management and refunds
+- Real-time chat
+- Video consultation using WebRTC
+- Digital prescription access
+- Appointment history and notifications
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Doctor
+- Professional onboarding and document verification
+- Profile and availability management
+- Appointment management
+- Video consultation
+- Prescription management
+- Dashboard and earnings overview
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Administrator
+- Doctor verification workflow
+- User and appointment management
+- Platform wallet management
+- Transaction monitoring
+- Dashboard and analytics
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Technology Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Redux Toolkit
+- React Router
+- Tailwind CSS
+- Axios
+- Socket.IO Client
+
+### Backend
+
+- Node.js
+- Express.js
+- TypeScript
+- MongoDB
+- Mongoose
+
+### Third-Party Services
+
+- JWT Authentication
+- Google OAuth
+- Stripe
+- Cloudinary
+- Socket.IO
+- WebRTC
+- Node Cron
+
+## Architecture
+
+The backend follows **Clean Architecture** to ensure maintainability, scalability, and separation of concerns.
+
+```
+Domain
+Application
+Infrastructure
+Presentation
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The project follows Dependency Injection and Repository patterns to keep business logic independent from frameworks and external services.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Backend
+
+```bash
+npm install
+npm run dev
 ```
+
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+## Production Build
+
+### Frontend
+
+```bash
+npm run build
+```
+
+### Backend
+
+```bash
+npm run build
+```
+
+## Environment Variables
+
+Create the required `.env` files for both the frontend and backend before running the application.
+
+## Project Status
+
+The project is actively maintained and follows a production-oriented architecture with a focus on scalability, modularity, and maintainability.
+
+## Author
+
+**Nimisha K S**
+
+MERN Stack Developer
